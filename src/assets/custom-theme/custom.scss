@@ -65,7 +65,7 @@ div.body {
 #detail-vehicle {
 	position: relative;
 	width: 0;
-	background: #f7f7f7;
+	background: #ffffff;
 	padding: 25px;
 	float: left;
 	margin-left: 25px;
@@ -85,14 +85,14 @@ div.body {
 	}
 
 	.item-label {
-		color: black;
+		color: #909399;
 		font-weight: bold;
 		font-size: 14px;
 		margin-bottom: 10px;
 	}
 
 	.item-text {
-		color: black;
+		color: #606266;
 		font-size: 16px;
 		margin-bottom: 15px;
 		opacity: 0.6;
@@ -117,18 +117,20 @@ div.body {
 
 .violation-ruleForm {
 	.item-input {
-	  padding-left: 0;
-	  margin-bottom: 15px;
+		padding-left: 0;
+		margin-bottom: 15px;
 	}
+
 	.item {
-	  .el-tooltip.item {
-		position: absolute;
-		right: 0;
-		width: 29px;
-		cursor: pointer;
-		.el-icon-document-copy {
-		  font-size: 30px;
+		.el-tooltip.item {
+			position: absolute;
+			right: 0;
+			width: 29px;
+			cursor: pointer;
+
+			.el-icon-document-copy {
+				font-size: 30px;
+			}
 		}
-	  }
 	}
-  }
+}

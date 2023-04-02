@@ -117,6 +117,7 @@ export default {
   data() {
     return {
       loading: true,
+	  loadingVehicle: false,
       vehicleList: [],
       multiSelected: [],
       allSelected: false,
@@ -273,6 +274,55 @@ export default {
         });
         this.onChangeInputSearch();
       }
+    },
+	
+    closeDetail() {
+      document.getElementById('detail-vehicle').style.display = 'none'
+      document.getElementById('detail-vehicle').style.width = '0'
+      document.getElementById('vehicle-table').style.width = 'calc(100%)'
+    },
+
+	destroy(vehicle) {
+      this.$confirm("Bạn có chắc chắn muốn xóa lựa chọn này?", "", {
+        confirmButtonText: "Xác nhận",
+        cancelButtonText: "Thoát",
+        type: "warning",
+      })
+        .then(() => {
+          const headers = {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + Cookies.get("access-token"),
+          };
+          this.loadingVehicle = true;
+		  let params = this.multiSelected.map(function (val) {
+            return val.uuid;
+          });
+		  params.push(vehicle.uuid)
+          params = {
+            uuids: params,
+          };
+          axios
+            .delete(process.env.VUE_APP_API + "vehicle", {
+              headers: headers,
+              data: params,
+            })
+            .then((res) => {
+              this.multiSelected = [];
+              this.onChangeInputSearch();
+			  this.closeDetail()
+              this.loadingVehicle = false;
+            })
+            .catch((err) => {
+              this.multiSelected = [];
+              this.onChangeInputSearch();
+              this.loadingVehicle = false;
+              this.$message({
+                type: "warning",
+                message: "Có lỗi xảy ra vui lòng thử lại",
+              });
+            });
+        })
+        .catch(() => {});
     },
   },
   watch: {
