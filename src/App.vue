@@ -5,7 +5,17 @@
 </template>
 
 <script>
+import axios from "axios";
+import Cookies from "js-cookie";
+
 export default {
-  name: 'App'
-}
+  name: "App",
+  data() {},
+  methods: {
+    logMsg() {
+      console.log(axios);
+      console.log(Cookies);
+    },
+  },
+};
 </script>

@@ -94,9 +94,9 @@
 </template>
 
 <script>
-import axios from "axios";
+// import axios from "axios";
 import SocialSign from "./components/SocialSignin";
-import Cookies from "js-cookie";
+// import Cookies from "js-cookie";
 import { setToken } from '@/utils/auth'
 
 export default {
@@ -183,7 +183,7 @@ export default {
         if (valid) {
           this.loading = true;
 	  	  let self = this;
-		  axios.post('http://localhost:8181/v1.0/user/login', this.loginForm)
+		  axios.post(process.env.VUE_APP_API + 'user/login', this.loginForm)
             .then((res) => {
               self.$router.push({ path: this.redirect || '/', query: this.otherQuery })
 			  console.log("redirect:  ", self.redirect)
