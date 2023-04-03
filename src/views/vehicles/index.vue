@@ -1,3 +1,4 @@
+<!-- eslint-disable vue/valid-v-model -->
 <template>
   <div class="body">
     <div>
@@ -107,6 +108,60 @@
         </template>
       </div>
     </div>
+
+    <el-dialog
+      title="Cập nhật"
+      :visible.sync="dialogEdit"
+      width="500px"
+      :close-on-click-modal="false"
+    >
+      <el-form
+        ref="editForm"
+        :model="vehicleInfo"
+        :rules="rules"
+        label-position="top"
+        label-width="200px"
+      >
+        <div class="block-item">
+          <div class="item-mid">
+            <el-form-item style="margin-bottom: 21px" label="Loại phương tiện" prop="vehicleType">
+              <el-select
+                v-model="vehicleInfo.vehicleType"
+                placeholder="Chọn loại phương tiện"
+                style="width: 100%"
+              >
+                <el-option
+                  v-for="type in vehicleTypeList"
+                  :key="type.value"
+                  :label="type.label"
+                  :value="type.value"
+                />
+              </el-select>
+            </el-form-item>
+            <el-form-item style="margin-bottom: 21px" label="Thương hiệu" prop="brand">
+              <el-input v-model="vehicleInfo.brand" />
+            </el-form-item>
+            <el-form-item style="margin-bottom: 21px" label="Màu sắc" prop="color">
+              <el-input
+                v-model="vehicleInfo.color"
+              />
+            </el-form-item>
+            <el-form-item style="margin-bottom: 21px" label="Biển số" prop="place">
+              <el-input v-model="vehicleInfo.place" maxlength="9" />
+            </el-form-item>
+          </div>
+        </div>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button class="cancel-btn" type="info" @click="dialogEdit = false">Hủy</el-button>
+        <el-button
+          type="primary"
+          :loading="loadingVehicle"
+          @click="editVehicle()"
+        >Lưu
+        </el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -135,6 +190,7 @@ export default {
       multiSelected: [],
       allSelected: false,
       loading_delete_all: false,
+      dialogEdit: false,
       queryPage: {
         page: 0,
         size: 10,
@@ -150,7 +206,52 @@ export default {
         ownerName: '',
         status: null
       },
-      vehicleDetail: {}
+      vehicleInfo: {
+        uuid: '',
+        vehicleType: '',
+        place: '',
+        color: '',
+        brand: '',
+        ownerName: '',
+        status: ''
+      },
+      vehicleDetail: {},
+	  vehicleTypeList: [
+        {
+          value: 'CAR',
+          label: 'Ô tô'
+        },
+        {
+          value: 'MOTO',
+          label: 'Xe máy'
+        },
+        {
+          value: 'TRAM',
+          label: 'Xe đạp điện'
+        },
+        {
+          value: 'BIKE',
+          label: 'Xe đạp'
+        }
+	  ],
+	  rules: {
+        vehicleType: [
+          {
+            required: true,
+            message: 'Loại phương tiện là bắt buộc',
+            trigger: 'blur'
+          }
+        //   { validator: vehicleType }
+        ],
+        place: [
+          {
+            required: true,
+            message: 'Biển số là bắt buộc',
+            trigger: 'blur'
+          },
+          { max: 9, message: 'Tối đa 9 ký tự', trigger: 'blur' }
+        ]
+      }
     }
   },
   watch: {
@@ -220,7 +321,7 @@ export default {
           this.loading = false
           this.$message({
             type: 'error',
-            message: 'Có lỗi xảy ra vui lòng thử lại sau!'
+            message: err.data.message
           })
         })
     },
@@ -265,7 +366,7 @@ export default {
               this.loading_delete_all = false
               this.$message({
                 type: 'warning',
-                message: 'Có lỗi xảy ra vui lòng thử lại'
+                message: err.data.message
               })
             })
         })
@@ -278,10 +379,10 @@ export default {
         this.vehicleDetail = row
         if (this.vehicleDetail) {
           document.getElementById('vehicle-table').style.width =
-            'calc(100% - 500px)'
+            'calc(100% - 425px)'
           setTimeout(function() {
             document.getElementById('detail-vehicle').style.display = 'block'
-            document.getElementById('detail-vehicle').style.width = '465px'
+            document.getElementById('detail-vehicle').style.width = '400px'
           }, 500)
         }
       } else {
@@ -342,7 +443,66 @@ export default {
             })
         })
         .catch(() => {})
+    },
+
+    handleEdit(data) {
+      this.vehicleInfo = data
+      this.dialogEdit = true
+      this.$nextTick(() => {
+        this.$refs['editForm'].clearValidate()
+      })
+    },
+
+    editVehicle() {
+    //   this.vehicleInfo = this.$root.trimData(this.vehicleInfo)
+      this.$refs.editForm.validate((valid) => {
+        if (valid) {
+          const params = {
+            vehicleType: this.vehicleInfo.vehicleType.trim(),
+            place: this.vehicleInfo.place.trim(),
+            color: this.vehicleInfo.color.trim(),
+            brand: this.vehicleInfo.brand.trim()
+          }
+		  const headers = {
+            'Content-Type': 'application/json',
+            Authorization: 'Bearer ' + Cookies.get('access-token')
+          }
+          this.loadingVehicle = true
+          axios
+            .put(process.env.VUE_APP_API + 'vehicle/' + this.vehicleInfo.uuid, params, { headers })
+            .then((response) => {
+              if (response.data.status === 200 || response.data.status === 201) {
+                this.dialogEdit = false
+                this.getList()
+                this.$message({
+                  message: response.data.message,
+                  type: 'success'
+                })
+              } else {
+                this.dialogEdit = false
+                this.getVehicle()
+                this.$message({
+                  message: response.data.message,
+                  type: 'error'
+                })
+              }
+              this.loadingVehicle = false
+            })
+            .catch((err) => {
+              this.loadingVehicle = false
+			  console.log(err)
+              // this.$notify({
+              //   title: "Lỗi",
+              //   message: "Sửa thất bại",
+              //   type: "error",
+              // });
+            })
+        } else {
+          return false
+        }
+      })
     }
+
   }
 }
 </script>
