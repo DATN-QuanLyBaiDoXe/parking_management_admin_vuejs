@@ -62,9 +62,8 @@
         :loading="loading"
         type="primary"
         style="width: 100%; margin-bottom: 30px"
-        @click.native.prevent="handleLogin"
-        >Login</el-button
-      >
+        @click="handleLogin"
+      >Login</el-button>
 
       <!-- <div style="position:relative">
         <div class="tips">
@@ -85,79 +84,79 @@
     <el-dialog title="Or connect with" :visible.sync="showDialog">
       Can not be simulated on local, so please combine you own business
       simulation! ! !
-      <br />
-      <br />
-      <br />
+      <br>
+      <br>
+      <br>
       <social-sign />
     </el-dialog>
   </div>
 </template>
 
 <script>
-// import axios from "axios";
-import SocialSign from "./components/SocialSignin";
-// import Cookies from "js-cookie";
+import axios from 'axios'
+import SocialSign from './components/SocialSignin'
+import Cookies from 'js-cookie'
 import { setToken } from '@/utils/auth'
 
 export default {
-  name: "Login",
+  name: 'Login',
   components: { SocialSign },
   data() {
     const validateUsername = (rule, value, callback) => {
-      if (value.trim() === "") {
-        callback(new Error("Tên đăng nhập không được để trống"));
+      if (value.trim() === '') {
+        callback(new Error('Tên đăng nhập không được để trống'))
       } else {
-        callback();
+        callback()
       }
-    };
+    }
     const validatePassword = (rule, value, callback) => {
-      if (value.trim() === "") {
-        callback(new Error("Mật khẩu không được để trống"));
+      if (value.trim() === '') {
+        callback(new Error('Mật khẩu không được để trống'))
       } else {
-        callback();
+        callback()
       }
-    };
+    }
     return {
       loginForm: {
-        username: "admin",
-        password: "111111",
+        username: 'admin',
+        password: '111111'
       },
       loginRules: {
         username: [
-          { required: true, trigger: "blur", validator: validateUsername },
+          { required: true, trigger: 'blur', validator: validateUsername }
         ],
         password: [
-          { required: true, trigger: "blur", validator: validatePassword },
-        ],
+          { required: true, trigger: 'blur', validator: validatePassword }
+        ]
       },
-      passwordType: "password",
+      passwordType: 'password',
       capsTooltip: false,
       loading: false,
       showDialog: false,
       redirect: undefined,
-      otherQuery: {},
-    };
+      otherQuery: {}
+    }
   },
   watch: {
     $route: {
-      handler: function (route) {
-        const query = route.query;
+      handler: function(route) {
+        const query = route.query
         if (query) {
-          this.redirect = query.redirect;
-          this.otherQuery = this.getOtherQuery(query);
+          this.redirect = query.redirect
+          this.otherQuery = this.getOtherQuery(query)
         }
       },
-      immediate: true,
-    },
+      immediate: true
+    }
   },
   created() {
     // window.addEventListener('storage', this.afterQRScan)
   },
   mounted() {
-    if (this.loginForm.username === "") {
-      this.$refs.username.focus();
-    } else if (this.loginForm.password === "") {
-      this.$refs.password.focus();
+    if (this.loginForm.username === '') {
+      this.$refs.username.focus()
+    } else if (this.loginForm.password === '') {
+      this.$refs.password.focus()
     }
   },
   destroyed() {
@@ -165,75 +164,60 @@ export default {
   },
   methods: {
     checkCapslock(e) {
-      const { key } = e;
-      this.capsTooltip = key && key.length === 1 && key >= "A" && key <= "Z";
+      const { key } = e
+      this.capsTooltip = key && key.length === 1 && key >= 'A' && key <= 'Z'
     },
     showPwd() {
-      if (this.passwordType === "password") {
-        this.passwordType = "";
+      if (this.passwordType === 'password') {
+        this.passwordType = ''
       } else {
-        this.passwordType = "password";
+        this.passwordType = 'password'
       }
       this.$nextTick(() => {
-        this.$refs.password.focus();
-      });
+        this.$refs.password.focus()
+      })
     },
     handleLogin() {
       this.$refs.loginForm.validate((valid) => {
         if (valid) {
-          this.loading = true;
-	  	  let self = this;
-		  axios.post(process.env.VUE_APP_API + 'user/login', this.loginForm)
+          this.loading = true
+          const self = this
+          axios
+            .post(process.env.VUE_APP_API + 'user/login', this.loginForm)
             .then((res) => {
-              self.$router.push({ path: this.redirect || '/', query: this.otherQuery })
-			  console.log("redirect:  ", self.redirect)
+              setToken()
+              Cookies.set('access-token', res.data.data.accessToken, {
+                expires: 7
+              })
+              self.$router.push({
+                path: this.redirect || '/',
+                query: this.otherQuery
+              })
               this.loading = false
-			  setToken()
-              Cookies.set('access-token', res.data.data.accessToken, { expires: 7 });
             })
             .catch((err) => {
               this.loading = false
-			  this.$message({
-                type: "error",
-                message: "Sai tên đăng nhập hoặc mật khẩu",
-              });
+              this.$message({
+                type: 'error',
+                message: err.response.data.message
+              })
             })
-        //   axios
-        //     .post("http://localhost:8181/v1.0/user/login", this.loginForm)
-        //     .then((res) => {
-        //       if (res.data.status === 200) {
-        //         this.$router.push({
-        //           path: this.redirect || "/",
-        //           query: this.otherQuery,
-        //         });
-        //         this.loading = false;
-        //         setToken(res.data.data.accessToken);
-        //         Cookies.set('Admin-Token', 'admin-token');
-        //       }
-        //     })
-        //     .catch((err) => {
-        //       this.loading = false;
-        //       this.$message({
-        //         type: "error",
-        //         message: "Sai tên đăng nhập hoặc mật khẩu",
-        //       });
-        //     });
         } else {
-          console.log("error submit!!");
-          return false;
+          console.log('error submit!!')
+          return false
         }
-      });
+      })
     },
     getOtherQuery(query) {
       return Object.keys(query).reduce((acc, cur) => {
-        if (cur !== "redirect") {
-          acc[cur] = query[cur];
+        if (cur !== 'redirect') {
+          acc[cur] = query[cur]
         }
-        return acc;
-      }, {});
-    },
-  },
-};
+        return acc
+      }, {})
+    }
+  }
+}
 </script>
 
 <style lang="scss">

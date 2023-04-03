@@ -29,6 +29,7 @@ export default {
     RightPanel,
     Settings,
     Sidebar,
+    // eslint-disable-next-line vue/no-unused-components
     TagsView
   },
   mixins: [ResizeMixin],
