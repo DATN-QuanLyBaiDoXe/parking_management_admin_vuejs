@@ -1,4 +1,3 @@
-<!-- eslint-disable vue/valid-v-model -->
 <template>
   <div class="body">
     <div>
@@ -9,15 +8,19 @@
         prefix-icon="el-icon-search"
         @change="onChangeInputSearch"
       />
+      <el-button
+        class="btn-add"
+        type="primary"
+        icon="el-icon-plus"
+        @click="dialogAdd = true"
+      >Thêm mới</el-button>
     </div>
     <div class="mb-4">
-      <div id="vehicle-table">
+      <div id="account-table">
         <!-- <div class="table-responsive"> -->
         <div v-if="multiSelected.length > 0" id="select-all-delete">
           <i class="el-icon-close" @click="closeDelete()" />
-          <span
-            v-if="multiSelected.length < 10"
-          >0{{ multiSelected.length }}</span><span v-else>{{ multipleSelection.length }}</span> mục được chọn
+          <span v-if="multiSelected.length < 10">0{{ multiSelected.length }}</span><span v-else>{{ multipleSelection.length }}</span> mục được chọn
           <el-button
             type="danger"
             :loading="loading_delete_all"
@@ -26,14 +29,13 @@
         </div>
         <el-table
           ref="multipleTable"
-          v-loading="loading"
           :data="userList"
           style="width: 100%"
           @selection-change="handleSelectionChange"
           @row-click="rowClicked"
         >
-          <el-table-column type="selection" width="50" />
-          <el-table-column label="STT" width="50">
+          <el-table-column type="selection" width="70" />
+          <el-table-column label="STT" width="70">
             <template slot-scope="scope">{{
               scope.$index +
                 1 +
@@ -64,26 +66,26 @@
           @current-change="handleCurrentChange"
         />
       </div>
-      <div id="detail-vehicle" class="violation-ruleForm" style="width: 0">
+      <div id="detail-account" class="violation-ruleForm" style="width: 0">
         <i class="el-icon-close" @click="closeDetail()" />
         <template v-if="userDetail">
           <div class="avatar" />
+
+          <template v-if="userDetail.fullName">
+            <div class="item-label">Họ và tên</div>
+            <div class="item-text">{{ userDetail.fullName }}</div>
+          </template>
 
           <template v-if="userDetail.username">
             <div class="item-label">Tên đăng nhập</div>
             <div class="item-text">{{ userDetail.username }}</div>
           </template>
 
-          <template v-if="userDetail.fullName">
-            <div class="item-label">Họ và tên</div>
-            <div class="item-text">
-              {{ userDetail.fullName }}
-            </div>
-          </template>
-
           <template v-if="userDetail.birthday">
             <div class="item-label">Ngày sinh</div>
-            <div class="item-text">{{ userDetail.birthday | formatDatetime }}</div>
+            <div class="item-text">
+              {{ userDetail.birthday | formatDatetime }}
+            </div>
           </template>
 
           <template v-if="userDetail.phoneNumber">
@@ -105,7 +107,7 @@
             <el-button
               type="danger"
               style="float: right"
-              :loading="loadingVehicle"
+              :loading="loadingUser"
               @click="destroy(userDetail)"
             ><i class="el-icon-delete" /> Xóa
             </el-button>
@@ -113,6 +115,118 @@
         </template>
       </div>
     </div>
+
+    <el-dialog
+      title="Thêm mới"
+      :visible.sync="dialogAdd"
+      width="700px"
+      :close-on-click-modal="false"
+      @close="closeDialog('addForm')"
+    >
+      <el-form
+        ref="addForm"
+        :model="user"
+        :rules="rules"
+        label-position="top"
+        label-width="100%"
+      >
+        <div class="block-item">
+          <div class="item-left">
+            <el-form-item
+              style="margin-bottom: 21px"
+              label="Tên đăng nhập"
+              prop="username"
+            >
+              <el-input v-model.trim="user.username" />
+            </el-form-item>
+
+            <el-form-item
+              style="margin-bottom: 21px"
+              label="Mật khẩu đăng nhập"
+              prop="password"
+            >
+              <el-input v-model="user.password" type="password" />
+            </el-form-item>
+
+            <el-form-item
+              style="margin-bottom: 21px"
+              label="Nhập lại mật khẩu"
+              prop="matchingPassword"
+            >
+              <el-input v-model="user.matchingPassword" type="password" />
+            </el-form-item>
+          </div>
+          <div class="item-right">
+            <el-form-item>
+              <div class="img_avatar" label="Avatar" prop="avatar">
+                <img v-if="url" class="image" height="178px" width="178px">
+                <img v-else class="image" height="178px" width="178px">
+                <!-- <img v-else class="image" @click="handleClick"> -->
+                <!-- <div class="img_icon">
+                  <input
+                    v-if="uploadReady"
+                    ref="file"
+                    type="file"
+                    hidden
+                    @change="fileSelected"
+                  >
+                  <div class="avatar-uploader">
+                    <i class="el-icon-camera-solid avatar-uploader-icon" />
+                  </div>
+                </div> -->
+              </div>
+            </el-form-item>
+          </div>
+        </div>
+        <div class="block-item">
+          <div class="item-left">
+            <el-form-item
+              style="margin-bottom: 21px"
+              label="Họ tên"
+              prop="fullName"
+            >
+              <el-input v-model="user.fullName" />
+            </el-form-item>
+
+            <el-form-item
+              style="margin-bottom: 21px"
+              label="Ngày sinh"
+              prop="birthday"
+            >
+              <el-date-picker
+                v-model="user.birthday"
+                type="date"
+                placeholder="Ngày sinh"
+                format="dd/MM/yyyy"
+                style="width: 100%"
+              />
+            </el-form-item>
+
+            <el-form-item
+              style="margin-bottom: 21px"
+              label="Email"
+              prop="email"
+            >
+              <el-input v-model="user.email" />
+            </el-form-item>
+
+            <el-form-item
+              style="margin-bottom: 21px"
+              label="Điện thoại"
+              prop="phoneNumber"
+            >
+              <el-input v-model="user.phoneNumber" />
+            </el-form-item>
+          </div>
+          <div class="item-right" />
+        </div>
+      </el-form>
+
+      <div slot="footer" class="dialog-footer">
+        <el-button type="info" @click="dialogAdd = false">Thoát</el-button>
+        <el-button type="primary">Lưu </el-button>
+      </div>
+    </el-dialog>
 
     <el-dialog
       title="Cập nhật"
@@ -173,6 +287,7 @@
 <script>
 import axios from 'axios'
 import moment from 'moment'
+import { validEmail, validPhone } from '@/utils/validate'
 import Cookies from 'js-cookie'
 
 export default {
@@ -184,20 +299,44 @@ export default {
     }
   },
   data() {
+    const validateEmail = (rule, value, callback) => {
+      if (!validEmail(value)) {
+        callback(new Error('Vui lòng nhập đúng định dạng email'))
+      } else {
+        callback()
+      }
+    }
+
+    const validateMobile = (rule, value, callback) => {
+      if (value && !validPhone(value)) {
+        callback(new Error('Vui lòng nhập đúng định dạng số điện thoại'))
+      } else {
+        callback()
+      }
+    }
+
+    var validatePass2 = (rule, value, callback) => {
+      if (value === '') {
+        callback(new Error('Xác nhận mật khẩu là bắt buộc'))
+      } else if (value !== this.userInfo.password) {
+        callback(new Error('Mật khẩu không trùng khớp'))
+      } else {
+        callback()
+      }
+    }
+
     return {
-      loading: true,
-      loadingVehicle: false,
       userList: [],
       multiSelected: [],
       allSelected: false,
       loading_delete_all: false,
-      dialogEdit: false,
       queryPage: {
         page: 0,
         size: 10,
         total: 0,
         search: ''
       },
+      dialogAdd: false,
       user: {
         uuid: '',
         username: '',
@@ -212,6 +351,7 @@ export default {
         avatar: '',
         role: ''
       },
+	  userDetail: {},
       userInfo: {
         uuid: '',
         username: '',
@@ -226,23 +366,43 @@ export default {
         avatar: '',
         role: ''
       },
-      userDetail: {},
-	  rules: {
-        vehicleType: [
+      rules: {
+        username: [
           {
             required: true,
-            message: 'Loại phương tiện là bắt buộc',
+            message: 'Tên đăng nhập là bắt buộc',
             trigger: 'blur'
           }
-        //   { validator: vehicleType }
         ],
-        place: [
+        fullName: [
+          { required: true, message: 'Họ và tên là bắt buộc', trigger: 'blur' }
+        ],
+        phoneNumber: [
           {
             required: true,
-            message: 'Biển số là bắt buộc',
+            message: 'Số điện thoại là bắt buộc',
             trigger: 'blur'
           },
-          { max: 9, message: 'Tối đa 9 ký tự', trigger: 'blur' }
+          { validator: validateMobile }
+        ],
+        email: [
+          { required: true, message: 'Email là bắt buộc', trigger: 'blur' },
+          { validator: validateEmail }
+        ],
+        password: [
+          { required: true, message: 'Mật khẩu là bắt buộc', trigger: 'blur' },
+          { min: 4, message: 'Mật khẩu tối thiểu 4 ký tự', trigger: 'blur' }
+        ],
+        matchingPassword: [
+          {
+            required: true,
+            message: 'Nhập lại mật khẩu là bắt buộc',
+            trigger: 'blur'
+          },
+          { validator: validatePass2, trigger: 'blur' }
+        ],
+        birthday: [
+          { required: true, message: 'Ngày sinh là bắt buộc', trigger: 'blur' }
         ]
       }
     }
@@ -261,6 +421,7 @@ export default {
       }
     }
   },
+
   created() {
     this.getUser()
   },
@@ -288,7 +449,6 @@ export default {
       this.multiSelected = val
     },
     getUser() {
-      this.loading = true
       const headers = {
         'Content-Type': 'multipart/form-data',
         Authorization: 'Bearer ' + Cookies.get('access-token')
@@ -306,7 +466,6 @@ export default {
           if (res.data) {
             this.userList = res.data.data
             this.queryPage.total = res.data.total
-            this.loading = false
           }
         })
         .catch((err) => {
@@ -314,7 +473,7 @@ export default {
           this.loading = false
           this.$message({
             type: 'error',
-            message: err.data.message
+            message: 'Có lỗi xảy ra vui lòng thử lại sau!'
           })
         })
     },
@@ -359,7 +518,7 @@ export default {
               this.loading_delete_all = false
               this.$message({
                 type: 'warning',
-                message: err.data.message
+                message: 'Có lỗi xảy ra vui lòng thử lại'
               })
             })
         })
@@ -371,16 +530,16 @@ export default {
       if (row) {
         this.userDetail = row
         if (this.userDetail) {
-          document.getElementById('vehicle-table').style.width =
+          document.getElementById('account-table').style.width =
             'calc(100% - 425px)'
           setTimeout(function() {
-            document.getElementById('detail-vehicle').style.display = 'block'
-            document.getElementById('detail-vehicle').style.width = '400px'
+            document.getElementById('detail-account').style.display = 'block'
+            document.getElementById('detail-account').style.width = '400px'
           }, 500)
         }
       } else {
         this.$message({
-          message: 'Không tìm thấy phương tiện',
+          message: 'Không tìm thấy tài khoản',
           type: 'error'
         })
         this.onChangeInputSearch()
@@ -388,114 +547,10 @@ export default {
     },
 
     closeDetail() {
-      document.getElementById('detail-vehicle').style.display = 'none'
-      document.getElementById('detail-vehicle').style.width = '0'
-      document.getElementById('vehicle-table').style.width = 'calc(100%)'
-    },
-
-    destroy(vehicle) {
-      this.$confirm('Bạn có chắc chắn muốn xóa lựa chọn này?', '', {
-        confirmButtonText: 'Xác nhận',
-        cancelButtonText: 'Thoát',
-        type: 'warning'
-      })
-        .then(() => {
-          const headers = {
-            'Content-Type': 'application/json',
-            Authorization: 'Bearer ' + Cookies.get('access-token')
-          }
-          this.loadingVehicle = true
-          let params = this.multiSelected.map(function(val) {
-            return val.uuid
-          })
-          params.push(vehicle.uuid)
-          params = {
-            uuids: params
-          }
-          axios
-            .delete(process.env.VUE_APP_API + 'vehicle', {
-              headers: headers,
-              data: params
-            })
-            .then((res) => {
-              console.log(res)
-              this.multiSelected = []
-              this.onChangeInputSearch()
-              this.closeDetail()
-              this.loadingVehicle = false
-            })
-            .catch((err) => {
-              console.log(err)
-              this.multiSelected = []
-              this.onChangeInputSearch()
-              this.loadingVehicle = false
-              this.$message({
-                type: 'warning',
-                message: 'Có lỗi xảy ra vui lòng thử lại'
-              })
-            })
-        })
-        .catch(() => {})
-    },
-
-    handleEdit(data) {
-      this.userInfo = data
-      this.dialogEdit = true
-      this.$nextTick(() => {
-        this.$refs['editForm'].clearValidate()
-      })
-    },
-
-    editVehicle() {
-    //   this.userInfo = this.$root.trimData(this.userInfo)
-      this.$refs.editForm.validate((valid) => {
-        if (valid) {
-          const params = {
-            vehicleType: this.userInfo.vehicleType.trim(),
-            place: this.userInfo.place.trim(),
-            color: this.userInfo.color.trim(),
-            brand: this.userInfo.brand.trim()
-          }
-		  const headers = {
-            'Content-Type': 'application/json',
-            Authorization: 'Bearer ' + Cookies.get('access-token')
-          }
-          this.loadingVehicle = true
-          axios
-            .put(process.env.VUE_APP_API + 'vehicle/' + this.userInfo.uuid, params, { headers })
-            .then((response) => {
-              if (response.data.status === 200 || response.data.status === 201) {
-                this.dialogEdit = false
-                this.getList()
-                this.$message({
-                  message: response.data.message,
-                  type: 'success'
-                })
-              } else {
-                this.dialogEdit = false
-                this.getUser()
-                this.$message({
-                  message: response.data.message,
-                  type: 'error'
-                })
-              }
-              this.loadingVehicle = false
-            })
-            .catch((err) => {
-              this.loadingVehicle = false
-			  console.log(err)
-              // this.$notify({
-              //   title: "Lỗi",
-              //   message: "Sửa thất bại",
-              //   type: "error",
-              // });
-            })
-        } else {
-          return false
-        }
-      })
+      document.getElementById('detail-account').style.display = 'none'
+      document.getElementById('detail-account').style.width = '0'
+      document.getElementById('account-table').style.width = 'calc(100%)'
     }
-
   }
 }
 </script>
