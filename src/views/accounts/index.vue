@@ -89,7 +89,9 @@
 
           <template v-if="userDetail.birthday">
             <div class="item-label">Ngày sinh</div>
-            <div class="item-text">{{ userDetail.birthday | formatDatetime }}</div>
+            <div class="item-text">
+              {{ userDetail.birthday | formatDatetime }}
+            </div>
           </template>
 
           <template v-if="userDetail.phoneNumber">
@@ -136,14 +138,22 @@
       >
         <div class="block-item">
           <div class="item-left">
-            <el-form-item style="margin-bottom: 21px" label="Họ và tên" prop="fullName">
+            <el-form-item
+              style="margin-bottom: 21px"
+              label="Họ và tên"
+              prop="fullName"
+            >
               <el-input
                 v-model="userInfo.fullName"
                 placeholder="Nhập họ và tên"
               />
             </el-form-item>
 
-            <el-form-item style="margin-bottom: 21px" label="Tên đăng nhập" prop="username">
+            <el-form-item
+              style="margin-bottom: 21px"
+              label="Tên đăng nhập"
+              prop="username"
+            >
               <el-input
                 v-model.trim="userInfo.username"
                 placeholder="Nhập tên đăng nhập"
@@ -153,7 +163,11 @@
               />
             </el-form-item>
 
-            <el-form-item style="margin-bottom: 21px" label="Mật khẩu" prop="password">
+            <el-form-item
+              style="margin-bottom: 21px"
+              label="Mật khẩu"
+              prop="password"
+            >
               <el-input
                 v-model="userInfo.password"
                 type="password"
@@ -204,7 +218,11 @@
         </div>
         <div class="block-item">
           <div class="item-left">
-            <el-form-item style="margin-bottom: 21px" label="Nhập lại mật khẩu" prop="matchingPassword">
+            <el-form-item
+              style="margin-bottom: 21px"
+              label="Nhập lại mật khẩu"
+              prop="matchingPassword"
+            >
               <el-input
                 v-model="userInfo.matchingPassword"
                 type="password"
@@ -215,7 +233,11 @@
               />
             </el-form-item>
 
-            <el-form-item style="margin-bottom: 21px" label="Ngày sinh" prop="birthday">
+            <el-form-item
+              style="margin-bottom: 21px"
+              label="Ngày sinh"
+              prop="birthday"
+            >
               <el-date-picker
                 v-model="userInfo.birthday"
                 type="date"
@@ -226,25 +248,37 @@
               />
             </el-form-item>
 
-            <el-form-item style="margin-bottom: 21px" label="Giới tính" prop="gender">
-              <el-radio v-model="userInfo.gender" label="1" style="margin-right: 105px">Nam</el-radio>
+            <el-form-item
+              style="margin-bottom: 21px"
+              label="Giới tính"
+              prop="gender"
+            >
+              <el-radio
+                v-model="userInfo.gender"
+                label="1"
+                style="margin-right: 105px"
+              >Nam</el-radio>
               <el-radio v-model="userInfo.gender" label="2">Nữ</el-radio>
             </el-form-item>
-
           </div>
           <div class="item-right">
-            <el-form-item style="margin-bottom: 21px" label="Số điện thoại" prop="phoneNumber">
+            <el-form-item
+              style="margin-bottom: 21px"
+              label="Số điện thoại"
+              prop="phoneNumber"
+            >
               <el-input
                 v-model="userInfo.phoneNumber"
                 placeholder="Nhập số điện thoại"
               />
             </el-form-item>
 
-            <el-form-item style="margin-bottom: 21px" label="Email" prop="email">
-              <el-input
-                v-model="userInfo.email"
-                placeholder="Nhập email"
-              />
+            <el-form-item
+              style="margin-bottom: 21px"
+              label="Email"
+              prop="email"
+            >
+              <el-input v-model="userInfo.email" placeholder="Nhập email" />
             </el-form-item>
 
             <el-form-item style="margin-bottom: 21px" label="Quyền" prop="role">
@@ -262,13 +296,16 @@
                 />
               </el-select>
             </el-form-item>
-
           </div>
         </div>
       </el-form>
 
       <div slot="footer" class="dialog-footer">
-        <el-button class="cancel-btn" type="info" @click="dialogAdd = false">Hủy</el-button>
+        <el-button
+          class="cancel-btn"
+          type="info"
+          @click="dialogAdd = false"
+        >Hủy</el-button>
         <el-button
           type="primary"
           :loading="loading_add"
@@ -405,7 +442,7 @@ export default {
       multiSelected: [],
       allSelected: false,
       loading_delete_all: false,
-	  loading_add: false,
+      loading_add: false,
       dialogEdit: false,
       dialogAdd: false,
       queryPage: {
@@ -442,7 +479,7 @@ export default {
         avatar: '',
         role: ''
       },
-	  userUpdate: {
+      userUpdate: {
         uuid: '',
         username: '',
         password: '',
@@ -455,24 +492,24 @@ export default {
         address: '',
         avatar: '',
         role: ''
-	  },
+      },
       userDetail: {},
       imagecropperKey: 0,
       imagecropperShow: false,
-	  url: null,
+      url: null,
       user_default: user_default,
       uploadReady: true,
-	  datePickerOptions: {
+      datePickerOptions: {
         disabledDate(date) {
           return date > moment().valueOf()
         }
       },
-	  file: {
+      file: {
         data: null
       },
       avatarHeight: 200,
       avatarWith: 200,
-	  rolesLst: [
+      rolesLst: [
         {
           value: 1,
           label: 'Quản trị viên'
@@ -481,15 +518,15 @@ export default {
           value: 2,
           label: 'Nhân viên'
         }
-	  ],
-	  rules: {
+      ],
+      rules: {
         fullName: [
           {
             required: true,
             message: 'Họ và tên là bắt buộc',
             trigger: 'blur'
           }
-        //   { validator: vehicleType }
+          //   { validator: vehicleType }
         ],
         username: [
           {
@@ -757,7 +794,7 @@ export default {
     },
 
     editVehicle() {
-    //   this.userInfo = this.$root.trimData(this.userInfo)
+      //   this.userInfo = this.$root.trimData(this.userInfo)
       this.$refs.editForm.validate((valid) => {
         if (valid) {
           const params = {
@@ -766,15 +803,22 @@ export default {
             color: this.userInfo.color.trim(),
             brand: this.userInfo.brand.trim()
           }
-		  const headers = {
+          const headers = {
             'Content-Type': 'application/json',
             Authorization: 'Bearer ' + Cookies.get('access-token')
           }
           this.loadingVehicle = true
           axios
-            .put(process.env.VUE_APP_API + 'vehicle/' + this.userInfo.uuid, params, { headers })
+            .put(
+              process.env.VUE_APP_API + 'vehicle/' + this.userInfo.uuid,
+              params,
+              { headers }
+            )
             .then((response) => {
-              if (response.data.status === 200 || response.data.status === 201) {
+              if (
+                response.data.status === 200 ||
+                response.data.status === 201
+              ) {
                 this.dialogEdit = false
                 this.getList()
                 this.$message({
@@ -793,7 +837,7 @@ export default {
             })
             .catch((err) => {
               this.loadingVehicle = false
-			  console.log(err)
+              console.log(err)
               // this.$notify({
               //   title: "Lỗi",
               //   message: "Sửa thất bại",
@@ -858,8 +902,7 @@ export default {
         }
       })
     },
-    closeChangeAvatar() {
-    },
+    closeChangeAvatar() {},
     handleClick(e) {
       if (e.target !== this.$refs.file) {
         e.preventDefault()
@@ -880,19 +923,21 @@ export default {
           const data = _.cloneDeep(this.userInfo)
           // const paramRegister = this.userInfo
           const paramRegister = {
-            'username': data.username,
-            'password': data.password,
-            'matchingPassword': data.matchingPassword,
-            'email': data.email,
-            'phoneNumber': data.phoneNumber,
-            'fullName': data.fullName,
-            'gender': data.gender,
-            'birthday': data.birthday,
-            'address': data.address,
-            'role': data.role
+            username: data.username,
+            password: data.password,
+            matchingPassword: data.matchingPassword,
+            email: data.email,
+            phoneNumber: data.phoneNumber,
+            fullName: data.fullName,
+            gender: data.gender,
+            birthday: data.birthday,
+            address: data.address,
+            role: data.role
           }
           paramRegister.avatar = this.url
-          paramRegister.birthday = moment(paramRegister.birthday).format('DD/MM/YYYY')
+          paramRegister.birthday = moment(paramRegister.birthday).format(
+            'DD/MM/YYYY'
+          )
           this.loading_add = true
           axios
             .post(process.env.VUE_APP_API + 'user', paramRegister, { headers })
@@ -923,50 +968,49 @@ export default {
         }
       })
     }
-
   }
 }
 </script>
 
 <style lang="scss">
 .el-dialog {
-    margin-top: 30px !important;
-  }
+  margin-top: 30px !important;
+}
 
-  .item-left {
-    width: 48%;
-    float: left;
-    margin-right: 2%;
-  }
+.item-left {
+  width: 48%;
+  float: left;
+  margin-right: 2%;
+}
 
-  .item-right {
-    width: 48%;
-    float: left;
-    margin-left: 2%;
-  }
+.item-right {
+  width: 48%;
+  float: left;
+  margin-left: 2%;
+}
 
-  .block-item {
-    width: 100%;
-    float: left;
-  }
+.block-item {
+  width: 100%;
+  float: left;
+}
 
 #select-all-delete .el-icon-close {
-    font-size: 14px;
-    margin-left: 18px;
-    margin-right: 29px;
-    top: 4px;
-    cursor: pointer;
+  font-size: 14px;
+  margin-left: 18px;
+  margin-right: 29px;
+  top: 4px;
+  cursor: pointer;
 }
 
 .el-icon-camera-solid {
-    font-size: 25px;
-    color: #9a9a9a;
-    position: relative;
-    top: -50px;
-    left: 54px;
-    background: #dfdfdf;
-    border-radius: 50%;
-    padding: 8px;
-    border: 1px solid white;
-  }
+  font-size: 25px;
+  color: #9a9a9a;
+  position: relative;
+  top: -50px;
+  left: 54px;
+  background: #dfdfdf;
+  border-radius: 50%;
+  padding: 8px;
+  border: 1px solid white;
+}
 </style>
