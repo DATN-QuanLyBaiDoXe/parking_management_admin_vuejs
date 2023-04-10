@@ -9,6 +9,12 @@
         prefix-icon="el-icon-search"
         @change="onChangeInputSearch"
       />
+      <el-button
+        class="btn-add"
+        type="primary"
+        icon="el-icon-plus"
+        @click="dialogAdd = true"
+      >Thêm mới</el-button>
     </div>
     <div class="mb-4">
       <div id="vehicle-table">
@@ -42,7 +48,7 @@
           </el-table-column>
           <el-table-column prop="fullName" label="Họ và tên" />
           <el-table-column prop="username" label="Tên đăng nhập" />
-          <el-table-column label="Giới tính">
+          <el-table-column id="gender" label="Giới tính">
             <template slot-scope="scope">{{
               scope.row.gender === 1 ? "Nam" : "Nữ"
             }}</template>
@@ -115,6 +121,164 @@
     </div>
 
     <el-dialog
+      title="Thêm mới"
+      :visible.sync="dialogAdd"
+      width="700px"
+      :close-on-click-modal="false"
+      @close="closeDialog('addForm')"
+    >
+      <el-form
+        ref="addForm"
+        :model="userInfo"
+        :rules="rules"
+        label-position="top"
+        label-width="100%"
+      >
+        <div class="block-item">
+          <div class="item-left">
+            <el-form-item style="margin-bottom: 21px" label="Họ và tên" prop="fullName">
+              <el-input
+                v-model="userInfo.fullName"
+                placeholder="Nhập họ và tên"
+              />
+            </el-form-item>
+
+            <el-form-item style="margin-bottom: 21px" label="Tên đăng nhập" prop="username">
+              <el-input
+                v-model.trim="userInfo.username"
+                placeholder="Nhập tên đăng nhập"
+                @copy.native.prevent
+                @paste.native.prevent
+                @click.native.right.prevent
+              />
+            </el-form-item>
+
+            <el-form-item style="margin-bottom: 21px" label="Mật khẩu" prop="password">
+              <el-input
+                v-model="userInfo.password"
+                type="password"
+                placeholder="Nhập mật khẩu"
+              />
+            </el-form-item>
+          </div>
+          <div class="item-right">
+            <el-form-item>
+              <div class="img_avatar" label="Avatar" prop="avatar">
+                <img
+                  v-if="url"
+                  class="image"
+                  height="200px"
+                  width="200px"
+                  :src="url"
+                  :alt="url"
+                  @click="handleClick"
+                >
+                <img
+                  v-else
+                  class="image"
+                  height="200px"
+                  width="200px"
+                  :src="user_default"
+                  :alt="user_default"
+                  @click="handleClick"
+                >
+                <img v-else class="image" @click="handleClick">
+                <div class="img_icon">
+                  <input
+                    v-if="uploadReady"
+                    ref="file"
+                    type="file"
+                    hidden
+                    @change="fileSelected"
+                  >
+                  <div class="avatar-uploader">
+                    <i
+                      class="el-icon-camera-solid avatar-uploader-icon"
+                      @click="handleClick"
+                    />
+                  </div>
+                </div>
+              </div>
+            </el-form-item>
+          </div>
+        </div>
+        <div class="block-item">
+          <div class="item-left">
+            <el-form-item style="margin-bottom: 21px" label="Nhập lại mật khẩu" prop="matchingPassword">
+              <el-input
+                v-model="userInfo.matchingPassword"
+                type="password"
+                placeholder="Nhập lại mật khẩu"
+                @copy.native.prevent
+                @paste.native.prevent
+                @click.native.right.prevent
+              />
+            </el-form-item>
+
+            <el-form-item style="margin-bottom: 21px" label="Ngày sinh" prop="birthday">
+              <el-date-picker
+                v-model="userInfo.birthday"
+                type="date"
+                :picker-options="datePickerOptions"
+                placeholder="Ngày sinh"
+                format="dd/MM/yyyy"
+                style="width: 100%"
+              />
+            </el-form-item>
+
+            <el-form-item style="margin-bottom: 21px" label="Giới tính" prop="gender">
+              <el-radio v-model="userInfo.gender" label="1" style="margin-right: 105px">Nam</el-radio>
+              <el-radio v-model="userInfo.gender" label="2">Nữ</el-radio>
+            </el-form-item>
+
+          </div>
+          <div class="item-right">
+            <el-form-item style="margin-bottom: 21px" label="Số điện thoại" prop="phoneNumber">
+              <el-input
+                v-model="userInfo.phoneNumber"
+                placeholder="Nhập số điện thoại"
+              />
+            </el-form-item>
+
+            <el-form-item style="margin-bottom: 21px" label="Email" prop="email">
+              <el-input
+                v-model="userInfo.email"
+                placeholder="Nhập email"
+              />
+            </el-form-item>
+
+            <el-form-item style="margin-bottom: 21px" label="Quyền" prop="role">
+              <el-select
+                v-model="userInfo.role"
+                filterable
+                placeholder="Chọn quyền"
+                style="width: 100%"
+              >
+                <el-option
+                  v-for="role in rolesLst"
+                  :key="role.value"
+                  :label="role.label"
+                  :value="role.value"
+                />
+              </el-select>
+            </el-form-item>
+
+          </div>
+        </div>
+      </el-form>
+
+      <div slot="footer" class="dialog-footer">
+        <el-button class="cancel-btn" type="info" @click="dialogAdd = false">Hủy</el-button>
+        <el-button
+          type="primary"
+          :loading="loading_add"
+          @click="addUser()"
+        >Lưu
+        </el-button>
+      </div>
+    </el-dialog>
+
+    <!-- <el-dialog
       title="Cập nhật"
       :visible.sync="dialogEdit"
       width="500px"
@@ -166,7 +330,21 @@
         >Lưu
         </el-button>
       </div>
-    </el-dialog>
+    </el-dialog> -->
+
+    <!-- <image-cropper
+      v-show="imagecropperShow"
+      :key="imagecropperKey"
+      title="Cập nhật ảnh đại diện"
+      :file="file"
+      :width="avatarWith"
+      :height="avatarHeight"
+      field="file"
+      url="user/avatar"
+      lang-type="vi"
+      @close="imagecropperShow = false"
+      @crop-upload-success="cropSuccess"
+    /> -->
   </div>
 </template>
 
@@ -174,6 +352,8 @@
 import axios from 'axios'
 import moment from 'moment'
 import Cookies from 'js-cookie'
+import user_default from '@/assets/images/user_default.png'
+import { validEmail, validPhone } from '@/utils/validate'
 
 export default {
   name: 'Accounts',
@@ -184,6 +364,40 @@ export default {
     }
   },
   data() {
+    const validateEmail = (rule, value, callback) => {
+      if (!validEmail(value)) {
+        callback(new Error('Vui lòng nhập đúng định dạng email'))
+      } else {
+        callback()
+      }
+    }
+
+    const validateMobile = (rule, value, callback) => {
+      if (value && !validPhone(value)) {
+        callback(new Error('Vui lòng nhập đúng định dạng số điện thoại'))
+      } else {
+        callback()
+      }
+    }
+
+    const validateRole = (rule, value, callback) => {
+      if (value == null) {
+        callback(new Error('Nhóm quyền là bắt buộc'))
+      } else {
+        callback()
+      }
+    }
+
+    var validatePass2 = (rule, value, callback) => {
+      if (value === '') {
+        callback(new Error('Xác nhận mật khẩu là bắt buộc'))
+      } else if (value !== this.userInfo.password) {
+        callback(new Error('Mật khẩu không trùng khớp'))
+      } else {
+        callback()
+      }
+    }
+
     return {
       loading: true,
       loadingVehicle: false,
@@ -191,7 +405,9 @@ export default {
       multiSelected: [],
       allSelected: false,
       loading_delete_all: false,
+	  loading_add: false,
       dialogEdit: false,
+      dialogAdd: false,
       queryPage: {
         page: 0,
         size: 10,
@@ -206,7 +422,7 @@ export default {
         fullName: '',
         phoneNumber: '',
         email: '',
-        gender: null,
+        gender: '',
         birthday: '',
         address: '',
         avatar: '',
@@ -220,29 +436,123 @@ export default {
         fullName: '',
         phoneNumber: '',
         email: '',
-        gender: null,
+        gender: '',
         birthday: '',
         address: '',
         avatar: '',
         role: ''
       },
+	  userUpdate: {
+        uuid: '',
+        username: '',
+        password: '',
+        matchingPassword: '',
+        fullName: '',
+        phoneNumber: '',
+        email: '',
+        gender: '',
+        birthday: '',
+        address: '',
+        avatar: '',
+        role: ''
+	  },
       userDetail: {},
+      imagecropperKey: 0,
+      imagecropperShow: false,
+	  url: null,
+      user_default: user_default,
+      uploadReady: true,
+	  datePickerOptions: {
+        disabledDate(date) {
+          return date > moment().valueOf()
+        }
+      },
+	  file: {
+        data: null
+      },
+      avatarHeight: 200,
+      avatarWith: 200,
+	  rolesLst: [
+        {
+          value: 1,
+          label: 'Quản trị viên'
+        },
+        {
+          value: 2,
+          label: 'Nhân viên'
+        }
+	  ],
 	  rules: {
-        vehicleType: [
+        fullName: [
           {
             required: true,
-            message: 'Loại phương tiện là bắt buộc',
+            message: 'Họ và tên là bắt buộc',
             trigger: 'blur'
           }
         //   { validator: vehicleType }
         ],
-        place: [
+        username: [
           {
             required: true,
-            message: 'Biển số là bắt buộc',
+            message: 'Tên đăng nhập là bắt buộc',
             trigger: 'blur'
           },
-          { max: 9, message: 'Tối đa 9 ký tự', trigger: 'blur' }
+          { max: 50, message: 'Tối đa 50 ký tự', trigger: 'blur' }
+        ],
+        password: [
+          {
+            required: true,
+            message: 'Mật khẩu là bắt buộc',
+            trigger: 'blur'
+          },
+          { min: 4, message: 'Tối thiểu 4 ký tự', trigger: 'blur' },
+          { max: 50, message: 'Tối đa 50 ký tự', trigger: 'blur' }
+        ],
+        matchingPassword: [
+          {
+            required: true,
+            message: 'Nhập lại mật khẩu là bắt buộc',
+            trigger: 'blur'
+          },
+          { validator: validatePass2, trigger: 'blur' }
+        ],
+        birthday: [
+          {
+            required: true,
+            message: 'Ngày sinh là bắt buộc',
+            trigger: 'blur'
+          }
+        ],
+        gender: [
+          {
+            required: true,
+            message: 'Giới tính là bắt buộc',
+            trigger: 'blur'
+          }
+        ],
+        phoneNumber: [
+          {
+            required: true,
+            message: 'Số điện thoại là bắt buộc',
+            trigger: 'blur'
+          },
+          { validator: validateMobile }
+        ],
+        email: [
+          {
+            required: true,
+            message: 'Email là bắt buộc',
+            trigger: 'blur'
+          },
+          { validator: validateEmail }
+        ],
+        role: [
+          {
+            required: true,
+            message: 'Quyền là bắt buộc',
+            trigger: 'blur'
+          },
+          { validator: validateRole }
         ]
       }
     }
@@ -372,10 +682,10 @@ export default {
         this.userDetail = row
         if (this.userDetail) {
           document.getElementById('vehicle-table').style.width =
-            'calc(100% - 425px)'
+            'calc(100% - 406px)'
           setTimeout(function() {
             document.getElementById('detail-vehicle').style.display = 'block'
-            document.getElementById('detail-vehicle').style.width = '400px'
+            document.getElementById('detail-vehicle').style.width = '380px'
           }, 500)
         }
       } else {
@@ -439,7 +749,7 @@ export default {
     },
 
     handleEdit(data) {
-      this.userInfo = data
+      this.userUpdate = data
       this.dialogEdit = true
       this.$nextTick(() => {
         this.$refs['editForm'].clearValidate()
@@ -494,11 +804,169 @@ export default {
           return false
         }
       })
+    },
+
+    cropSuccess(data) {
+      if (data.data[0].fileDownloadUri) this.url = data.data[0].fileDownloadUri
+    },
+    fileSelected(e) {
+      const file = e.target.files[0]
+      if (file) {
+        this.checkFile(file)
+          .then(() => {
+            this.file.data = file
+            this.imagecropperShow = true
+            this.resetUploadFile()
+          })
+          .catch((err) => {
+            this.$message({
+              message: err,
+              type: 'error',
+              duration: 5 * 1000,
+              showClose: true
+            })
+          })
+      }
+    },
+    checkFile(file) {
+      return new Promise((resolve, reject) => {
+        const self = this
+        if (file.type.indexOf('image') === -1) {
+          return reject('Định dạng không cho phép')
+        }
+        if (file.size > 5242880) {
+          return reject('Vượt quá dung lượng cho phép tối đa 5Mb')
+        }
+        const reader = new FileReader()
+        reader.readAsDataURL(file)
+        reader.onload = function(e) {
+          const image = new Image()
+          image.src = e.target.result
+          image.onload = function() {
+            const height = this.height
+            const width = this.width
+            if (height < self.avatarHeight || width < self.avatarWith) {
+              return reject(
+                'Kích thước hình ảnh quá nhỏ. Tối thiểu là: ' +
+                  self.avatarWith +
+                  '*' +
+                  self.avatarHeight
+              )
+            }
+            return resolve()
+          }
+        }
+      })
+    },
+    closeChangeAvatar() {
+    },
+    handleClick(e) {
+      if (e.target !== this.$refs.file) {
+        e.preventDefault()
+        if (document.activeElement !== this.$refs) {
+          this.$refs.file.click()
+        }
+      }
+    },
+
+    addUser() {
+      this.userInfo = this.$root.trimData(this.userInfo)
+      this.$refs.addForm.validate((valid) => {
+        if (valid) {
+          const headers = {
+            'Content-Type': 'application/json',
+            Authorization: 'Bearer ' + Cookies.get('access-token')
+          }
+          const data = _.cloneDeep(this.userInfo)
+          // const paramRegister = this.userInfo
+          const paramRegister = {
+            'username': data.username,
+            'password': data.password,
+            'matchingPassword': data.matchingPassword,
+            'email': data.email,
+            'phoneNumber': data.phoneNumber,
+            'fullName': data.fullName,
+            'gender': data.gender,
+            'birthday': data.birthday,
+            'address': data.address,
+            'role': data.role
+          }
+          paramRegister.avatar = this.url
+          paramRegister.birthday = moment(paramRegister.birthday).format('DD/MM/YYYY')
+          this.loading_add = true
+          axios
+            .post(process.env.VUE_APP_API + 'user', paramRegister, { headers })
+            .then((response) => {
+              if (response.status === 200 || response.status === 201) {
+                this.dialogAdd = false
+                this.getList()
+                this.$message({
+                  type: 'success',
+                  message: 'Thêm mới thành công'
+                })
+                this.loading_add = false
+              } else {
+                this.dialogAdd = false
+                this.loading_add = false
+                this.getList()
+                this.$message({
+                  message: response.data.message,
+                  type: 'error'
+                })
+              }
+            })
+            .catch(() => {
+              this.loading_add = false
+            })
+        } else {
+          return false
+        }
+      })
     }
 
   }
 }
 </script>
 
-<style>
+<style lang="scss">
+.el-dialog {
+    margin-top: 30px !important;
+  }
+
+  .item-left {
+    width: 48%;
+    float: left;
+    margin-right: 2%;
+  }
+
+  .item-right {
+    width: 48%;
+    float: left;
+    margin-left: 2%;
+  }
+
+  .block-item {
+    width: 100%;
+    float: left;
+  }
+
+#select-all-delete .el-icon-close {
+    font-size: 14px;
+    margin-left: 18px;
+    margin-right: 29px;
+    top: 4px;
+    cursor: pointer;
+}
+
+.el-icon-camera-solid {
+    font-size: 25px;
+    color: #9a9a9a;
+    position: relative;
+    top: -50px;
+    left: 54px;
+    background: #dfdfdf;
+    border-radius: 50%;
+    padding: 8px;
+    border: 1px solid white;
+  }
 </style>

@@ -62,7 +62,7 @@ div.body {
 	width: 100%;
 }
 
-#detail-vehicle, #detail-account {
+#detail-vehicle, #detail-account, #block-item {
 	position: relative;
 	width: 0;
 	background: #ffffff;
@@ -138,3 +138,12 @@ div.body {
 .dialog-footer .cancel-btn {
 	float: left;
 }
+
+.img_avatar {
+    text-align: center;
+    padding-top: 25px;
+
+    img {
+      border-radius: 50%;
+    }
+  }
