@@ -125,60 +125,6 @@
     <el-dialog
       title="Thêm mới"
       :visible.sync="dialogAdd"
-      width="500px"
-      :close-on-click-modal="false"
-    >
-      <el-form
-        ref="addForm"
-        :model="userInfo"
-        :rules="rules"
-        label-position="top"
-        label-width="200px"
-      >
-        <div class="block-item">
-          <div class="item-left">
-            <el-form-item style="margin-bottom: 21px" label="Họ và tên" prop="vehicleType">
-              <el-select
-                v-model="userInfo.vehicleType"
-                placeholder="Chọn loại phương tiện"
-                style="width: 100%"
-              >
-                <!-- <el-option
-                  v-for="type in vehicleTypeList"
-                  :key="type.value"
-                  :label="type.label"
-                  :value="type.value"
-                /> -->
-              </el-select>
-            </el-form-item>
-            <el-form-item style="margin-bottom: 21px" label="Thương hiệu" prop="brand">
-              <el-input v-model="userInfo.brand" />
-            </el-form-item>
-            <el-form-item style="margin-bottom: 21px" label="Màu sắc" prop="color">
-              <el-input
-                v-model="userInfo.color"
-              />
-            </el-form-item>
-            <el-form-item style="margin-bottom: 21px" label="Biển số" prop="place">
-              <el-input v-model="userInfo.place" maxlength="9" />
-            </el-form-item>
-          </div>
-        </div>
-      </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button class="cancel-btn" type="info" @click="dialogAdd = false">Hủy</el-button>
-        <el-button
-          type="primary"
-          :loading="loadingVehicle"
-          @click="saveAccount()"
-        >Lưu
-        </el-button>
-      </div>
-    </el-dialog>
-
-    <el-dialog
-      title="Thêm mới"
-      :visible.sync="dialogAdd"
       width="700px"
       :close-on-click-modal="false"
       @close="closeDialog('addForm')"
@@ -367,59 +313,196 @@
       </div>
     </el-dialog>
 
-    <!-- <el-dialog
+    <el-dialog
       title="Cập nhật"
       :visible.sync="dialogEdit"
-      width="500px"
+      width="700px"
       :close-on-click-modal="false"
+      @close="closeDialog('editForm')"
     >
       <el-form
         ref="editForm"
         :model="userInfo"
-        :rules="rules"
+        :rules="rulesEdit"
         label-position="top"
-        label-width="200px"
+        label-width="100%"
       >
         <div class="block-item">
-          <div class="item-mid">
-            <el-form-item style="margin-bottom: 21px" label="Loại phương tiện" prop="vehicleType">
+          <div class="item-left">
+            <el-form-item
+              style="margin-bottom: 21px"
+              label="Họ và tên"
+              prop="fullName"
+            >
+              <el-input
+                v-model="userInfo.fullName"
+                placeholder="Nhập họ và tên"
+              />
+            </el-form-item>
+
+            <el-form-item
+              style="margin-bottom: 21px"
+              label="Tên đăng nhập"
+              prop="username"
+            >
+              <el-input
+                v-model.trim="userInfo.username"
+                disabled
+                @copy.native.prevent
+                @paste.native.prevent
+                @click.native.right.prevent
+              />
+            </el-form-item>
+
+            <el-form-item
+              style="margin-bottom: 21px"
+              label="Mật khẩu"
+              prop="password"
+            >
+              <el-input
+                v-model="userInfo.password"
+                type="password"
+                placeholder="Nhập mật khẩu"
+              />
+            </el-form-item>
+          </div>
+          <div class="item-right">
+            <el-form-item>
+              <div class="img_avatar" label="Avatar" prop="avatar">
+                <img
+                  v-if="url"
+                  class="image"
+                  height="200px"
+                  width="200px"
+                  :src="url"
+                  :alt="url"
+                  @click="handleClick"
+                >
+                <img
+                  v-else
+                  class="image"
+                  height="200px"
+                  width="200px"
+                  :src="user_default"
+                  :alt="user_default"
+                  @click="handleClick"
+                >
+                <img v-else class="image" @click="handleClick">
+                <div class="img_icon">
+                  <input
+                    v-if="uploadReady"
+                    ref="file"
+                    type="file"
+                    hidden
+                    @change="fileSelected"
+                  >
+                  <div class="avatar-uploader">
+                    <i
+                      class="el-icon-camera-solid avatar-uploader-icon"
+                      @click="handleClick"
+                    />
+                  </div>
+                </div>
+              </div>
+            </el-form-item>
+          </div>
+        </div>
+        <div class="block-item">
+          <div class="item-left">
+            <el-form-item
+              style="margin-bottom: 21px"
+              label="Nhập lại mật khẩu"
+              prop="matchingPassword"
+            >
+              <el-input
+                v-model="userInfo.matchingPassword"
+                type="password"
+                placeholder="Nhập lại mật khẩu"
+                @copy.native.prevent
+                @paste.native.prevent
+                @click.native.right.prevent
+              />
+            </el-form-item>
+
+            <el-form-item
+              style="margin-bottom: 21px"
+              label="Ngày sinh"
+              prop="birthday"
+            >
+              <el-date-picker
+                v-model="userInfo.birthday"
+                type="date"
+                :picker-options="datePickerOptions"
+                placeholder="Ngày sinh"
+                format="dd/MM/yyyy"
+                style="width: 100%"
+              />
+            </el-form-item>
+
+            <el-form-item
+              style="margin-bottom: 21px"
+              label="Giới tính"
+              prop="gender"
+            >
+              <el-radio-group v-model="userInfo.gender">
+                <el-radio :label="0">Nam</el-radio>
+                <el-radio :label="1">Nữ</el-radio>
+              </el-radio-group>
+            </el-form-item>
+          </div>
+          <div class="item-right">
+            <el-form-item
+              style="margin-bottom: 21px"
+              label="Số điện thoại"
+              prop="phoneNumber"
+            >
+              <el-input
+                v-model="userInfo.phoneNumber"
+                placeholder="Nhập số điện thoại"
+              />
+            </el-form-item>
+
+            <el-form-item
+              style="margin-bottom: 21px"
+              label="Email"
+              prop="email"
+            >
+              <el-input v-model="userInfo.email" placeholder="Nhập email" />
+            </el-form-item>
+
+            <el-form-item style="margin-bottom: 21px" label="Quyền" prop="role">
               <el-select
-                v-model="userInfo.vehicleType"
-                placeholder="Chọn loại phương tiện"
+                v-model="userInfo.role"
+                filterable
+                placeholder="Chọn quyền"
                 style="width: 100%"
               >
                 <el-option
-                  v-for="type in vehicleTypeList"
-                  :key="type.value"
-                  :label="type.label"
-                  :value="type.value"
+                  v-for="role in rolesLst"
+                  :key="role.value"
+                  :label="role.label"
+                  :value="role.value"
                 />
               </el-select>
-            </el-form-item>
-            <el-form-item style="margin-bottom: 21px" label="Thương hiệu" prop="brand">
-              <el-input v-model="userInfo.brand" />
-            </el-form-item>
-            <el-form-item style="margin-bottom: 21px" label="Màu sắc" prop="color">
-              <el-input
-                v-model="userInfo.color"
-              />
-            </el-form-item>
-            <el-form-item style="margin-bottom: 21px" label="Biển số" prop="place">
-              <el-input v-model="userInfo.place" maxlength="9" />
             </el-form-item>
           </div>
         </div>
       </el-form>
+
       <div slot="footer" class="dialog-footer">
-        <el-button class="cancel-btn" type="info" @click="dialogEdit = false">Hủy</el-button>
+        <el-button
+          class="cancel-btn"
+          type="info"
+          @click="dialogAdd = false"
+        >Hủy</el-button>
         <el-button
           type="primary"
-          :loading="loadingVehicle"
-          @click="editVehicle()"
+          :loading="loading_add"
+          @click="addUser()"
         >Lưu
         </el-button>
       </div>
-    </el-dialog> -->
+    </el-dialog>
 
     <!-- <image-cropper
       v-show="imagecropperShow"
@@ -530,7 +613,7 @@ export default {
         fullName: '',
         phoneNumber: '',
         email: '',
-        gender: 1,
+        gender: 0,
         birthday: '',
         address: '',
         avatar: '',
@@ -601,6 +684,54 @@ export default {
           },
           { min: 4, message: 'Tối thiểu 4 ký tự', trigger: 'blur' },
           { max: 50, message: 'Tối đa 50 ký tự', trigger: 'blur' }
+        ],
+        matchingPassword: [
+          {
+            required: true,
+            message: 'Nhập lại mật khẩu là bắt buộc',
+            trigger: 'blur'
+          },
+          { validator: validatePass2, trigger: 'blur' }
+        ],
+        birthday: [
+          {
+            required: true,
+            message: 'Ngày sinh là bắt buộc',
+            trigger: 'blur'
+          }
+        ],
+        phoneNumber: [
+          {
+            required: true,
+            message: 'Số điện thoại là bắt buộc',
+            trigger: 'blur'
+          },
+          { validator: validateMobile }
+        ],
+        email: [
+          {
+            required: true,
+            message: 'Email là bắt buộc',
+            trigger: 'blur'
+          },
+          { validator: validateEmail }
+        ],
+        role: [
+          {
+            required: true,
+            message: 'Quyền là bắt buộc',
+            trigger: 'blur'
+          },
+          { validator: validateRole }
+        ]
+      },
+      rulesEdit: {
+        fullName: [
+          {
+            required: true,
+            message: 'Họ và tên là bắt buộc',
+            trigger: 'blur'
+          }
         ],
         matchingPassword: [
           {
@@ -836,7 +967,7 @@ export default {
     },
 
     handleEdit(data) {
-      this.userUpdate = data
+      this.userInfo = _.cloneDeep(data)
       this.dialogEdit = true
       this.$nextTick(() => {
         this.$refs['editForm'].clearValidate()
@@ -844,14 +975,18 @@ export default {
     },
 
     editVehicle() {
-      // this.userInfo = this.$root.trimData(this.userInfo)
+      this.userInfo = this.$root.trimData(this.userInfo)
       this.$refs.editForm.validate((valid) => {
         if (valid) {
           const params = {
-            vehicleType: this.userInfo.vehicleType.trim(),
-            place: this.userInfo.place.trim(),
-            color: this.userInfo.color.trim(),
-            brand: this.userInfo.brand.trim()
+            username: this.userInfo.username.trim(),
+            fullName: this.userInfo.fullName.trim(),
+            phoneNumber: this.userInfo.phoneNumber.trim(),
+            email: this.userInfo.email.trim(),
+            gender: this.userInfo.gender.trim(),
+            birthday: this.userInfo.birthday.trim(),
+            address: this.userInfo.address.trim(),
+            role: this.userInfo.role.trim()
           }
           const headers = {
             'Content-Type': 'application/json',
@@ -859,7 +994,7 @@ export default {
           }
           this.loadingVehicle = true
           axios
-            .put(process.env.VUE_APP_API + 'vehicle/' + this.userInfo.uuid, params, { headers })
+            .put(process.env.VUE_APP_API + 'user/' + data.uuid, params, { headers })
             .then((response) => {
               if (
                 response.data.status === 200 ||
@@ -884,11 +1019,6 @@ export default {
             .catch((err) => {
               this.loadingVehicle = false
               console.log(err)
-              // this.$notify({
-              //   title: "Lỗi",
-              //   message: "Sửa thất bại",
-              //   type: "error",
-              // });
             })
         } else {
           return false
