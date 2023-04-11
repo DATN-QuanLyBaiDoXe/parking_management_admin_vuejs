@@ -13,7 +13,7 @@
         class="btn-add"
         type="primary"
         icon="el-icon-plus"
-        @click="dialogAdd = true"
+        @click="handleCreate()"
       >Thêm mới</el-button>
     </div>
     <div class="mb-4">
@@ -493,12 +493,12 @@
         <el-button
           class="cancel-btn"
           type="info"
-          @click="dialogAdd = false"
+          @click="dialogEdit = false"
         >Hủy</el-button>
         <el-button
           type="primary"
           :loading="loading_add"
-          @click="addUser()"
+          @click="editUser()"
         >Lưu
         </el-button>
       </div>
@@ -570,6 +570,22 @@ export default {
         callback(new Error('Xác nhận mật khẩu là bắt buộc'))
       } else if (value !== this.userInfo.password) {
         callback(new Error('Mật khẩu không trùng khớp'))
+      } else {
+        callback()
+      }
+    }
+
+    var validatePassEdit = (rule, value, callback) => {
+      if (value !== this.userInfo.password && this.userInfo.password) {
+        callback(new Error('Mật khẩu không trùng khớp'))
+      } else {
+        callback()
+      }
+    }
+
+    var validatePassEdit2 = (rule, value, callback) => {
+      if (!value && this.userInfo.matchingPassword) {
+        callback(new Error('Mật khẩu không được để trống'))
       } else {
         callback()
       }
@@ -733,13 +749,12 @@ export default {
             trigger: 'blur'
           }
         ],
+        password: [
+          { min: 4, message: 'Mật khẩu tối thiểu 4 ký tự', trigger: 'blur' },
+          { validator: validatePassEdit2, trigger: 'blur' }
+        ],
         matchingPassword: [
-          {
-            required: true,
-            message: 'Nhập lại mật khẩu là bắt buộc',
-            trigger: 'blur'
-          },
-          { validator: validatePass2, trigger: 'blur' }
+          { validator: validatePassEdit, trigger: 'blur' }
         ],
         birthday: [
           {
@@ -797,6 +812,25 @@ export default {
       this.$refs[formName].clearValidate()
       this.$refs[formName].resetFields()
     },
+
+    resetDialog() {
+      this.url = null
+      this.userInfo = {
+        uuid: '',
+        email: '',
+        phoneNumber: '',
+        username: '',
+        fullName: '',
+        matchingPassword: '',
+        password: '',
+        gender: '',
+        birthday: '',
+        address: '',
+        avatar: '',
+        role: ''
+      }
+    },
+
     toggleAll(checked) {
       this.multiSelected = checked ? this.userList.slice() : []
     },
@@ -966,6 +1000,12 @@ export default {
         .catch(() => {})
     },
 
+    handleCreate() {
+      this.resetDialog()
+      this.dialogAdd = true
+	  this.userInfo.gender = 0
+    },
+
     handleEdit(data) {
       this.userInfo = _.cloneDeep(data)
       this.dialogEdit = true
@@ -974,7 +1014,7 @@ export default {
       })
     },
 
-    editVehicle() {
+    editUser() {
       this.userInfo = this.$root.trimData(this.userInfo)
       this.$refs.editForm.validate((valid) => {
         if (valid) {
@@ -983,18 +1023,19 @@ export default {
             fullName: this.userInfo.fullName.trim(),
             phoneNumber: this.userInfo.phoneNumber.trim(),
             email: this.userInfo.email.trim(),
-            gender: this.userInfo.gender.trim(),
+            gender: this.userInfo.gender,
             birthday: this.userInfo.birthday.trim(),
             address: this.userInfo.address.trim(),
-            role: this.userInfo.role.trim()
+            role: this.userInfo.role
           }
           const headers = {
             'Content-Type': 'application/json',
             Authorization: 'Bearer ' + Cookies.get('access-token')
           }
           this.loadingVehicle = true
+		  params.birthday = moment(params.birthday).format('DD/MM/YYYY')
           axios
-            .put(process.env.VUE_APP_API + 'user/' + data.uuid, params, { headers })
+            .put(process.env.VUE_APP_API + 'user/' + this.userInfo.uuid, params, { headers })
             .then((response) => {
               if (
                 response.data.status === 200 ||
@@ -1006,6 +1047,7 @@ export default {
                   message: response.data.message,
                   type: 'success'
                 })
+                this.resetDialog()
               } else {
                 this.dialogEdit = false
                 this.getUser()
@@ -1015,6 +1057,7 @@ export default {
                 })
               }
               this.loadingVehicle = false
+              this.resetDialog()
             })
             .catch((err) => {
               this.loadingVehicle = false
@@ -1127,6 +1170,7 @@ export default {
                 this.dialogAdd = false
                 this.getUser()
                 this.loading_add = false
+                this.resetDialog()
               } else {
                 this.$message({
                   message: response.data.message,
@@ -1135,6 +1179,7 @@ export default {
                 this.dialogAdd = false
                 this.loading_add = false
                 this.getUser()
+                this.resetDialog()
               }
             })
             .catch(() => {
