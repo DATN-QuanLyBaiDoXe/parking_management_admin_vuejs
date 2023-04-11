@@ -50,7 +50,7 @@
           <el-table-column prop="username" label="Tên đăng nhập" />
           <el-table-column id="gender" label="Giới tính">
             <template slot-scope="scope">{{
-              scope.row.gender === 1 ? "Nam" : "Nữ"
+              scope.row.gender === 0 ? "Nam" : "Nữ"
             }}</template>
           </el-table-column>
           <el-table-column label="Ngày sinh">
@@ -121,6 +121,60 @@
         </template>
       </div>
     </div>
+
+    <el-dialog
+      title="Thêm mới"
+      :visible.sync="dialogAdd"
+      width="500px"
+      :close-on-click-modal="false"
+    >
+      <el-form
+        ref="addForm"
+        :model="userInfo"
+        :rules="rules"
+        label-position="top"
+        label-width="200px"
+      >
+        <div class="block-item">
+          <div class="item-left">
+            <el-form-item style="margin-bottom: 21px" label="Họ và tên" prop="vehicleType">
+              <el-select
+                v-model="userInfo.vehicleType"
+                placeholder="Chọn loại phương tiện"
+                style="width: 100%"
+              >
+                <!-- <el-option
+                  v-for="type in vehicleTypeList"
+                  :key="type.value"
+                  :label="type.label"
+                  :value="type.value"
+                /> -->
+              </el-select>
+            </el-form-item>
+            <el-form-item style="margin-bottom: 21px" label="Thương hiệu" prop="brand">
+              <el-input v-model="userInfo.brand" />
+            </el-form-item>
+            <el-form-item style="margin-bottom: 21px" label="Màu sắc" prop="color">
+              <el-input
+                v-model="userInfo.color"
+              />
+            </el-form-item>
+            <el-form-item style="margin-bottom: 21px" label="Biển số" prop="place">
+              <el-input v-model="userInfo.place" maxlength="9" />
+            </el-form-item>
+          </div>
+        </div>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button class="cancel-btn" type="info" @click="dialogAdd = false">Hủy</el-button>
+        <el-button
+          type="primary"
+          :loading="loadingVehicle"
+          @click="saveAccount()"
+        >Lưu
+        </el-button>
+      </div>
+    </el-dialog>
 
     <el-dialog
       title="Thêm mới"
@@ -253,12 +307,10 @@
               label="Giới tính"
               prop="gender"
             >
-              <el-radio
-                v-model="userInfo.gender"
-                label="1"
-                style="margin-right: 105px"
-              >Nam</el-radio>
-              <el-radio v-model="userInfo.gender" label="2">Nữ</el-radio>
+              <el-radio-group v-model="userInfo.gender">
+                <el-radio :label="0">Nam</el-radio>
+                <el-radio :label="1">Nữ</el-radio>
+              </el-radio-group>
             </el-form-item>
           </div>
           <div class="item-right">
@@ -391,8 +443,13 @@ import moment from 'moment'
 import Cookies from 'js-cookie'
 import user_default from '@/assets/images/user_default.png'
 import { validEmail, validPhone } from '@/utils/validate'
+import { inject } from 'vue'
 
 export default {
+  setup() {
+    const appName = inject('appName')
+    console.log(appName)
+  },
   name: 'Accounts',
   filters: {
     formatDatetime: function(value) {
@@ -473,7 +530,7 @@ export default {
         fullName: '',
         phoneNumber: '',
         email: '',
-        gender: '',
+        gender: 1,
         birthday: '',
         address: '',
         avatar: '',
@@ -557,13 +614,6 @@ export default {
           {
             required: true,
             message: 'Ngày sinh là bắt buộc',
-            trigger: 'blur'
-          }
-        ],
-        gender: [
-          {
-            required: true,
-            message: 'Giới tính là bắt buộc',
             trigger: 'blur'
           }
         ],
@@ -760,7 +810,7 @@ export default {
             uuids: params
           }
           axios
-            .delete(process.env.VUE_APP_API + 'vehicle', {
+            .delete(process.env.VUE_APP_API + 'user', {
               headers: headers,
               data: params
             })
@@ -794,7 +844,7 @@ export default {
     },
 
     editVehicle() {
-      //   this.userInfo = this.$root.trimData(this.userInfo)
+      // this.userInfo = this.$root.trimData(this.userInfo)
       this.$refs.editForm.validate((valid) => {
         if (valid) {
           const params = {
@@ -809,18 +859,14 @@ export default {
           }
           this.loadingVehicle = true
           axios
-            .put(
-              process.env.VUE_APP_API + 'vehicle/' + this.userInfo.uuid,
-              params,
-              { headers }
-            )
+            .put(process.env.VUE_APP_API + 'vehicle/' + this.userInfo.uuid, params, { headers })
             .then((response) => {
               if (
                 response.data.status === 200 ||
                 response.data.status === 201
               ) {
                 this.dialogEdit = false
-                this.getList()
+                this.getUser()
                 this.$message({
                   message: response.data.message,
                   type: 'success'
@@ -942,22 +988,23 @@ export default {
           axios
             .post(process.env.VUE_APP_API + 'user', paramRegister, { headers })
             .then((response) => {
-              if (response.status === 200 || response.status === 201) {
-                this.dialogAdd = false
-                this.getList()
+              console.log(response.data)
+              if (response.data.status === 200 || response.data.status === 201) {
                 this.$message({
                   type: 'success',
                   message: 'Thêm mới thành công'
                 })
+                this.dialogAdd = false
+                this.getUser()
                 this.loading_add = false
               } else {
-                this.dialogAdd = false
-                this.loading_add = false
-                this.getList()
                 this.$message({
                   message: response.data.message,
                   type: 'error'
                 })
+                this.dialogAdd = false
+                this.loading_add = false
+                this.getUser()
               }
             })
             .catch(() => {

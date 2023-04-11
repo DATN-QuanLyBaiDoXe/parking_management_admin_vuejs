@@ -7,6 +7,7 @@
 <script>
 import axios from 'axios'
 import Cookies from 'js-cookie'
+import { provide } from 'vue'
 
 export default {
   name: 'App',
@@ -16,6 +17,9 @@ export default {
       console.log(axios)
       console.log(Cookies)
     }
+  },
+  setup() {
+    provide('App', 'vue3')
   }
 }
 </script>

@@ -19,6 +19,8 @@ import './permission' // permission control
 import './utils/error-log' // error log
 
 import * as filters from './filters' // global filters
+import commonFT from './mixins/common' // in main.js
+import _ from 'lodash'
 
 // import ElementUI from "element-ui";
 // import i18n from './lang'
@@ -53,5 +55,6 @@ new Vue({
   el: '#app',
   router,
   store,
+  mixins: [commonFT],
   render: h => h(App)
 })

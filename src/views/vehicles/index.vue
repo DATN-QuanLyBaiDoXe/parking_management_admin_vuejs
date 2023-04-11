@@ -204,7 +204,8 @@ export default {
         color: '',
         brand: '',
         ownerName: '',
-        status: null
+        status: null,
+        ownerId: ''
       },
       vehicleInfo: {
         uuid: '',
@@ -213,7 +214,8 @@ export default {
         color: '',
         brand: '',
         ownerName: '',
-        status: ''
+        status: '',
+        ownerId: ''
       },
       vehicleDetail: {},
 	  vehicleTypeList: [
@@ -446,7 +448,14 @@ export default {
     },
 
     handleEdit(data) {
-      this.vehicleInfo = data
+      this.vehicleInfo.uuid = data.uuid
+      this.vehicleInfo.vehicleType = data.vehicleType
+      this.vehicleInfo.place = data.place
+      this.vehicleInfo.color = data.color
+      this.vehicleInfo.brand = data.brand
+      this.vehicleInfo.ownerName = data.ownerName
+      this.vehicleInfo.status = data.status
+      this.vehicleInfo.ownerId = data.ownerId
       this.dialogEdit = true
       this.$nextTick(() => {
         this.$refs['editForm'].clearValidate()
@@ -461,7 +470,8 @@ export default {
             vehicleType: this.vehicleInfo.vehicleType.trim(),
             place: this.vehicleInfo.place.trim(),
             color: this.vehicleInfo.color.trim(),
-            brand: this.vehicleInfo.brand.trim()
+            brand: this.vehicleInfo.brand.trim(),
+            owner: this.vehicleInfo.ownerId
           }
 		  const headers = {
             'Content-Type': 'application/json',
@@ -473,7 +483,8 @@ export default {
             .then((response) => {
               if (response.data.status === 200 || response.data.status === 201) {
                 this.dialogEdit = false
-                this.getList()
+                this.closeDetail()
+                this.getVehicle()
                 this.$message({
                   message: response.data.message,
                   type: 'success'
