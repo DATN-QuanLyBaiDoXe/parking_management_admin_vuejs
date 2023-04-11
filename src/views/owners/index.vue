@@ -9,6 +9,12 @@
         prefix-icon="el-icon-search"
         @change="onChangeInputSearch"
       />
+      <el-button
+        class="btn-add"
+        type="primary"
+        icon="el-icon-plus"
+        @click="handleCreate()"
+      >Thêm mới</el-button>
     </div>
     <div class="mb-4">
       <div id="vehicle-table">
@@ -27,7 +33,7 @@
         <el-table
           ref="multipleTable"
           v-loading="loading"
-          :data="vehicleList"
+          :data="userList"
           style="width: 100%"
           @selection-change="handleSelectionChange"
           @row-click="rowClicked"
@@ -40,14 +46,9 @@
                 (queryPage.page > 0 ? queryPage.page - 1 : 0) * queryPage.size
             }}</template>
           </el-table-column>
-          <el-table-column label="Loại phương tiện">
-            <template slot-scope="scope">{{
-              scope.row.vehicleType | getVehicleTypeName
-            }}</template>
-          </el-table-column>
-          <el-table-column prop="place" label="Biển số" />
-          <el-table-column prop="color" label="Màu sắc" />
-          <el-table-column prop="brand" label="Thương hiệu" />
+          <el-table-column prop="fullName" label="Họ và tên" />
+          <el-table-column prop="phoneNumber" label="Số điện thoại" />
+          <el-table-column prop="address" label="Địa chỉ" />
         </el-table>
         <el-pagination
           :current-page.sync="queryPage.page"
@@ -61,53 +62,99 @@
       </div>
       <div id="detail-vehicle" class="violation-ruleForm" style="width: 0">
         <i class="el-icon-close" @click="closeDetail()" />
-        <template v-if="vehicleDetail">
+        <template v-if="userDetail">
           <div class="avatar" />
 
-          <template v-if="vehicleDetail.vehicleType">
-            <div class="item-label">Loại phương tiện</div>
+          <template v-if="userDetail.fullName">
+            <div class="item-label">Họ và tên</div>
             <div class="item-text">
-              {{ vehicleDetail.vehicleType | getVehicleTypeName }}
+              {{ userDetail.fullName }}
             </div>
           </template>
 
-          <template v-if="vehicleDetail.brand">
-            <div class="item-label">Thương hiệu</div>
-            <div class="item-text">{{ vehicleDetail.brand }}</div>
+          <template v-if="userDetail.phoneNumber">
+            <div class="item-label">Số điện thoại</div>
+            <div class="item-text">{{ userDetail.phoneNumber }}</div>
           </template>
 
-          <template v-if="vehicleDetail.color">
-            <div class="item-label">Màu sắc</div>
-            <div class="item-text">{{ vehicleDetail.color }}</div>
-          </template>
-
-          <template v-if="vehicleDetail.place">
-            <div class="item-label">Biển số</div>
-            <div class="item-text">{{ vehicleDetail.place }}</div>
-          </template>
-
-          <template v-if="vehicleDetail.ownerName">
-            <div class="item-label">Chủ sở hữu</div>
-            <div class="item-text">{{ vehicleDetail.ownerName }}</div>
+          <template v-if="userDetail.address">
+            <div class="item-label">Địa chỉ</div>
+            <div class="item-text">{{ userDetail.address }}</div>
           </template>
 
           <div class="action">
             <el-button
               type="info"
-              @click="handleEdit(vehicleDetail)"
+              @click="handleEdit(userDetail)"
             ><i class="el-icon-edit" /> Sửa
             </el-button>
             <el-button
-              type="danger"
-              style="float: right"
+              type="primary"
+              style="float: right; width: 170px"
               :loading="loadingVehicle"
-              @click="destroy(vehicleDetail)"
+              @click="handleAddVehicle(userDetail)"
+            ><i class="el-icon-plus" /> Thêm phương tiện
+            </el-button>
+          </div>
+          <div class="action" style="margin-top: 15px;">
+            <el-button
+              type="danger"
+              :loading="loadingVehicle"
+              @click="destroy(userDetail)"
             ><i class="el-icon-delete" /> Xóa
+            </el-button>
+            <el-button
+              type="default"
+              style="float: right; width: 170px; background-color: #D3D3D3"
+              @click="handleEdit(userDetail)"
+            ><i class="el-icon-view" /> Xem phương tiện
             </el-button>
           </div>
         </template>
       </div>
     </div>
+
+    <el-dialog
+      title="Thêm mới"
+      :visible.sync="dialogAdd"
+      width="500px"
+      :close-on-click-modal="false"
+      @close="closeDialog('addForm')"
+    >
+      <el-form
+        ref="addForm"
+        :model="userInfo"
+        :rules="rules"
+        label-position="top"
+        label-width="200px"
+      >
+        <div class="block-item">
+          <div class="item-mid">
+            <el-form-item style="margin-bottom: 21px" label="Họ và tên" prop="fullName">
+              <el-input v-model="userInfo.fullName" placeholder="Nhập họ và tên" />
+            </el-form-item>
+            <el-form-item style="margin-bottom: 21px" label="Số điện thoại" prop="phoneNumber">
+              <el-input
+                v-model="userInfo.phoneNumber"
+                placeholder="Nhập số điện thoại"
+              />
+            </el-form-item>
+            <el-form-item style="margin-bottom: 21px" label="Địa chỉ" prop="address">
+              <el-input v-model="userInfo.address" type="textarea" :rows="3" placeholder="Nhập địa chỉ" maxlength="255" />
+            </el-form-item>
+          </div>
+        </div>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button class="cancel-btn" type="info" @click="dialogAdd = false">Hủy</el-button>
+        <el-button
+          type="primary"
+          :loading="loadingVehicle"
+          @click="addOwner()"
+        >Lưu
+        </el-button>
+      </div>
+    </el-dialog>
 
     <el-dialog
       title="Cập nhật"
@@ -117,6 +164,47 @@
     >
       <el-form
         ref="editForm"
+        :model="userInfo"
+        :rules="rules"
+        label-position="top"
+        label-width="200px"
+      >
+        <div class="block-item">
+          <div class="item-mid">
+            <el-form-item style="margin-bottom: 21px" label="Họ và tên" prop="fullName">
+              <el-input v-model="userInfo.fullName" placeholder="Nhập họ và tên" />
+            </el-form-item>
+            <el-form-item style="margin-bottom: 21px" label="Số điện thoại" prop="phoneNumber">
+              <el-input
+                v-model="userInfo.phoneNumber"
+                placeholder="Nhập số điện thoại"
+              />
+            </el-form-item>
+            <el-form-item style="margin-bottom: 21px" label="Địa chỉ" prop="address">
+              <el-input v-model="userInfo.address" type="textarea" :rows="3" placeholder="Nhập địa chỉ" maxlength="255" />
+            </el-form-item>
+          </div>
+        </div>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button class="cancel-btn" type="info" @click="dialogEdit = false">Hủy</el-button>
+        <el-button
+          type="primary"
+          :loading="loadingVehicle"
+          @click="editUser()"
+        >Lưu
+        </el-button>
+      </div>
+    </el-dialog>
+
+    <el-dialog
+      title="Thêm phương tiện"
+      :visible.sync="dialogAddVehicle"
+      width="500px"
+      :close-on-click-modal="false"
+    >
+      <el-form
+        ref="addVehicleForm"
         :model="vehicleInfo"
         :rules="rules"
         label-position="top"
@@ -167,46 +255,62 @@
 
 <script>
 import axios from 'axios'
+import moment from 'moment'
 import Cookies from 'js-cookie'
+import { validPhone } from '@/utils/validate'
+import { inject } from 'vue'
 
 export default {
-  name: 'Vehicles',
-  filters: {
-    getVehicleTypeName: function(value) {
-      let type = ''
-      if (!value) type = ''
-      if (value === 'CAR') type = 'Ô tô'
-      if (value === 'MOTO') type = 'Xe máy'
-      if (value === 'TRAM') type = 'Xe đạp điện'
-      if (value === 'BIKE') type = 'Xe đạp'
-      return type
-    }
+  setup() {
+    const appName = inject('appName')
+    console.log(appName)
   },
+  name: 'Owners',
   data() {
+    const validateMobile = (rule, value, callback) => {
+      if (value && !validPhone(value)) {
+        callback(new Error('Vui lòng nhập đúng định dạng số điện thoại'))
+      } else {
+        callback()
+      }
+    }
+
     return {
       loading: true,
       loadingVehicle: false,
-      vehicleList: [],
+      userList: [],
       multiSelected: [],
       allSelected: false,
       loading_delete_all: false,
+      loading_add: false,
       dialogEdit: false,
+      dialogAdd: false,
+	  dialogAddVehicle: false,
       queryPage: {
         page: 0,
         size: 10,
         total: 0,
         search: ''
       },
-      vehicle: {
+      user: {
         uuid: '',
-        vehicleType: '',
-        place: '',
-        color: '',
-        brand: '',
-        ownerName: '',
-        status: null,
-        ownerId: ''
+        fullName: '',
+        phoneNumber: '',
+        address: ''
       },
+      userInfo: {
+        uuid: '',
+        fullName: '',
+        phoneNumber: '',
+        address: ''
+      },
+      userUpdate: {
+        uuid: '',
+        fullName: '',
+        phoneNumber: '',
+        address: ''
+      },
+      userDetail: {},
       vehicleInfo: {
         uuid: '',
         vehicleType: '',
@@ -236,22 +340,30 @@ export default {
           label: 'Xe đạp'
         }
 	  ],
-	  rules: {
-        vehicleType: [
+      rules: {
+        fullName: [
           {
             required: true,
-            message: 'Loại phương tiện là bắt buộc',
+            message: 'Họ và tên là bắt buộc',
             trigger: 'blur'
           }
-        //   { validator: vehicleType }
+          //   { validator: vehicleType }
         ],
-        place: [
+        phoneNumber: [
           {
             required: true,
-            message: 'Biển số là bắt buộc',
+            message: 'Số điện thoại là bắt buộc',
             trigger: 'blur'
           },
-          { max: 9, message: 'Tối đa 9 ký tự', trigger: 'blur' }
+          { validator: validateMobile }
+        ],
+        address: [
+          {
+            required: true,
+            message: 'Địa chỉ là bắt buộc',
+            trigger: 'blur'
+          },
+          { max: 255, message: 'Tối đa 255 ký tự', trigger: 'blur' }
         ]
       }
     }
@@ -271,39 +383,50 @@ export default {
     }
   },
   created() {
-    this.getVehicle()
+    this.getUser()
   },
   methods: {
     closeDialog(formName) {
       this.$refs[formName].clearValidate()
       this.$refs[formName].resetFields()
     },
+
+    resetDialog() {
+      this.url = null
+      this.userInfo = {
+        uuid: '',
+        phoneNumber: '',
+        fullName: '',
+        address: ''
+      }
+    },
+
     toggleAll(checked) {
       this.multiSelected = checked ? this.userList.slice() : []
     },
     handleSizeChange(size) {
       this.queryPage.size = size
-      this.getVehicle()
+      this.getUser()
     },
     handleCurrentChange(page) {
       this.queryPage.page = page
-      this.getVehicle()
+      this.getUser()
     },
     onChangeInputSearch() {
       this.queryPage.page = 0
-      this.getVehicle()
+      this.getUser()
     },
     handleSelectionChange(val) {
       this.multiSelected = val
     },
-    getVehicle() {
+    getUser() {
       this.loading = true
       const headers = {
         'Content-Type': 'multipart/form-data',
         Authorization: 'Bearer ' + Cookies.get('access-token')
       }
       axios
-        .get(process.env.VUE_APP_API + 'vehicle', {
+        .get(process.env.VUE_APP_API + 'vehicle/owner', {
           headers: headers,
           params: {
             page: this.queryPage.page > 0 ? this.queryPage.page - 1 : 0,
@@ -313,7 +436,7 @@ export default {
         })
         .then((res) => {
           if (res.data) {
-            this.vehicleList = res.data.data
+            this.userList = res.data.data
             this.queryPage.total = res.data.total
             this.loading = false
           }
@@ -352,7 +475,7 @@ export default {
             uuids: params
           }
           axios
-            .delete(process.env.VUE_APP_API + 'vehicle', {
+            .delete(process.env.VUE_APP_API + 'vehicle/owner', {
               headers: headers,
               data: params
             })
@@ -378,13 +501,13 @@ export default {
     async rowClicked(row) {
       this.flag_active = row.uuid
       if (row) {
-        this.vehicleDetail = row
-        if (this.vehicleDetail) {
+        this.userDetail = row
+        if (this.userDetail) {
           document.getElementById('vehicle-table').style.width =
-            'calc(100% - 425px)'
+            'calc(100% - 406px)'
           setTimeout(function() {
             document.getElementById('detail-vehicle').style.display = 'block'
-            document.getElementById('detail-vehicle').style.width = '400px'
+            document.getElementById('detail-vehicle').style.width = '380px'
           }, 500)
         }
       } else {
@@ -422,7 +545,7 @@ export default {
             uuids: params
           }
           axios
-            .delete(process.env.VUE_APP_API + 'vehicle', {
+            .delete(process.env.VUE_APP_API + 'vehicle/owner', {
               headers: headers,
               data: params
             })
@@ -432,6 +555,10 @@ export default {
               this.onChangeInputSearch()
               this.closeDetail()
               this.loadingVehicle = false
+			  this.$message({
+                type: 'success',
+                message: res.data.message
+              })
             })
             .catch((err) => {
               console.log(err)
@@ -439,84 +566,236 @@ export default {
               this.onChangeInputSearch()
               this.loadingVehicle = false
               this.$message({
-                type: 'warning',
-                message: 'Có lỗi xảy ra vui lòng thử lại'
+                type: 'error',
+                message: err.data.message
               })
             })
         })
         .catch(() => {})
     },
 
+    handleCreate() {
+      this.resetDialog()
+      this.dialogAdd = true
+	  this.userInfo.gender = 0
+    },
+
     handleEdit(data) {
-      this.vehicleInfo.uuid = data.uuid
-      this.vehicleInfo.vehicleType = data.vehicleType
-      this.vehicleInfo.place = data.place
-      this.vehicleInfo.color = data.color
-      this.vehicleInfo.brand = data.brand
-      this.vehicleInfo.ownerName = data.ownerName
-      this.vehicleInfo.status = data.status
-      this.vehicleInfo.ownerId = data.ownerId
+      this.userInfo = _.cloneDeep(data)
       this.dialogEdit = true
       this.$nextTick(() => {
         this.$refs['editForm'].clearValidate()
       })
     },
 
-    editVehicle() {
-    //   this.vehicleInfo = this.$root.trimData(this.vehicleInfo)
+    editUser() {
+      this.userInfo = this.$root.trimData(this.userInfo)
       this.$refs.editForm.validate((valid) => {
         if (valid) {
           const params = {
-            vehicleType: this.vehicleInfo.vehicleType.trim(),
-            place: this.vehicleInfo.place.trim(),
-            color: this.vehicleInfo.color.trim(),
-            brand: this.vehicleInfo.brand.trim(),
-            owner: this.vehicleInfo.ownerId
+            fullName: this.userInfo.fullName.trim(),
+            phoneNumber: this.userInfo.phoneNumber.trim(),
+            address: this.userInfo.address.trim()
           }
-		  const headers = {
+          const headers = {
             'Content-Type': 'application/json',
             Authorization: 'Bearer ' + Cookies.get('access-token')
           }
           this.loadingVehicle = true
           axios
-            .put(process.env.VUE_APP_API + 'vehicle/' + this.vehicleInfo.uuid, params, { headers })
+            .put(process.env.VUE_APP_API + 'vehicle/owner/' + this.userInfo.uuid, params, { headers })
             .then((response) => {
-              if (response.data.status === 200 || response.data.status === 201) {
+              if (
+                response.data.status === 200 ||
+                response.data.status === 201
+              ) {
                 this.dialogEdit = false
-                this.closeDetail()
-                this.getVehicle()
+                this.getUser()
                 this.$message({
                   message: response.data.message,
                   type: 'success'
                 })
+                this.resetDialog()
               } else {
                 this.dialogEdit = false
-                this.getVehicle()
+                this.getUser()
                 this.$message({
                   message: response.data.message,
                   type: 'error'
                 })
               }
               this.loadingVehicle = false
+              this.resetDialog()
             })
             .catch((err) => {
               this.loadingVehicle = false
-			  console.log(err)
-              // this.$notify({
-              //   title: "Lỗi",
-              //   message: "Sửa thất bại",
-              //   type: "error",
-              // });
+              console.log(err)
             })
         } else {
           return false
         }
       })
+    },
+    handleClick(e) {
+      if (e.target !== this.$refs.file) {
+        e.preventDefault()
+        if (document.activeElement !== this.$refs) {
+          this.$refs.file.click()
+        }
+      }
+    },
+
+    addOwner() {
+      this.userInfo = this.$root.trimData(this.userInfo)
+      this.$refs.addForm.validate((valid) => {
+        if (valid) {
+          const headers = {
+            'Content-Type': 'application/json',
+            Authorization: 'Bearer ' + Cookies.get('access-token')
+          }
+          const data = _.cloneDeep(this.userInfo)
+          // const paramRegister = this.userInfo
+          const paramRegister = {
+            phoneNumber: data.phoneNumber,
+            fullName: data.fullName,
+            address: data.address
+          }
+          this.loading_add = true
+          axios
+            .post(process.env.VUE_APP_API + 'vehicle/owner', paramRegister, { headers })
+            .then((response) => {
+              console.log(response.data)
+              if (response.data.status === 200 || response.data.status === 201) {
+                this.$message({
+                  type: 'success',
+                  message: response.data.message
+                })
+                this.dialogAdd = false
+                this.getUser()
+                this.loading_add = false
+                this.resetDialog()
+              } else {
+                this.$message({
+                  message: response.data.message,
+                  type: 'error'
+                })
+                this.dialogAdd = false
+                this.loading_add = false
+                this.getUser()
+                this.resetDialog()
+              }
+            })
+            .catch(() => {
+              this.loading_add = false
+            })
+        } else {
+          return false
+        }
+      })
+    },
+
+    handleAddVehicle(data) {
+      this.vehicleInfo.ownerId = data.uuid
+      this.dialogAddVehicle = true
+      this.$nextTick(() => {
+        this.$refs['addVehicleForm'].clearValidate()
+      })
     }
 
+    // addVehicle() {
+    // //   this.vehicleInfo = this.$root.trimData(this.vehicleInfo)
+    //   this.$refs.addVehicleForm.validate((valid) => {
+    //     if (valid) {
+    //       const params = {
+    //         vehicleType: this.vehicleInfo.vehicleType.trim(),
+    //         place: this.vehicleInfo.place.trim(),
+    //         color: this.vehicleInfo.color.trim(),
+    //         brand: this.vehicleInfo.brand.trim(),
+    //         owner: this.vehicleInfo.ownerId
+    //       }
+    // 	  const headers = {
+    //         'Content-Type': 'application/json',
+    //         Authorization: 'Bearer ' + Cookies.get('access-token')
+    //       }
+    //       this.loadingVehicle = true
+    //       axios
+    //         .post(process.env.VUE_APP_API + 'vehicle/' + this.vehicleInfo.uuid, params, { headers })
+    //         .then((response) => {
+    //           if (response.data.status === 200 || response.data.status === 201) {
+    //             this.dialogAddVehicle = false
+    //             this.closeDetail()
+    //             this.getVehicle()
+    //             this.$message({
+    //               message: response.data.message,
+    //               type: 'success'
+    //             })
+    //           } else {
+    //             this.dialogAddVehicle = false
+    //             this.getVehicle()
+    //             this.$message({
+    //               message: response.data.message,
+    //               type: 'error'
+    //             })
+    //           }
+    //           this.loadingVehicle = false
+    //         })
+    //         .catch((err) => {
+    //           this.loadingVehicle = false
+    // 		  console.log(err)
+    //           // this.$notify({
+    //           //   title: "Lỗi",
+    //           //   message: "Sửa thất bại",
+    //           //   type: "error",
+    //           // });
+    //         })
+    //     } else {
+    //       return false
+    //     }
+    //   })
+    // }
   }
 }
 </script>
 
-<style>
+<style lang="scss">
+.el-dialog {
+  margin-top: 30px !important;
+}
+
+.item-left {
+  width: 48%;
+  float: left;
+  margin-right: 2%;
+}
+
+.item-right {
+  width: 48%;
+  float: left;
+  margin-left: 2%;
+}
+
+.block-item {
+  width: 100%;
+  float: left;
+}
+
+#select-all-delete .el-icon-close {
+  font-size: 14px;
+  margin-left: 28px;
+  margin-right: 38px;
+  top: 4px;
+  cursor: pointer;
+}
+
+.el-icon-camera-solid {
+  font-size: 25px;
+  color: #9a9a9a;
+  position: relative;
+  top: -50px;
+  left: 54px;
+  background: #dfdfdf;
+  border-radius: 50%;
+  padding: 8px;
+  border: 1px solid white;
+}
 </style>

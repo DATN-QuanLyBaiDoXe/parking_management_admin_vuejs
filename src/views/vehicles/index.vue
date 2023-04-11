@@ -360,6 +360,10 @@ export default {
               this.multiSelected = []
               this.onChangeInputSearch()
               this.loading_delete_all = false
+              this.$message({
+                type: 'success',
+                message: res.data.message
+              })
             })
             .catch((err) => {
               console.log(err)
@@ -367,7 +371,7 @@ export default {
               this.onChangeInputSearch()
               this.loading_delete_all = false
               this.$message({
-                type: 'warning',
+                type: 'error',
                 message: err.data.message
               })
             })
@@ -432,6 +436,10 @@ export default {
               this.onChangeInputSearch()
               this.closeDetail()
               this.loadingVehicle = false
+			  this.$message({
+                type: 'success',
+                message: res.data.message
+              })
             })
             .catch((err) => {
               console.log(err)
@@ -439,7 +447,7 @@ export default {
               this.onChangeInputSearch()
               this.loadingVehicle = false
               this.$message({
-                type: 'warning',
+                type: 'error',
                 message: 'Có lỗi xảy ra vui lòng thử lại'
               })
             })

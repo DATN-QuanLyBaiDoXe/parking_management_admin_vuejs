@@ -504,7 +504,7 @@
       </div>
     </el-dialog>
 
-    <!-- <image-cropper
+    <image-cropper
       v-show="imagecropperShow"
       :key="imagecropperKey"
       title="Cập nhật ảnh đại diện"
@@ -516,7 +516,7 @@
       lang-type="vi"
       @close="imagecropperShow = false"
       @crop-upload-success="cropSuccess"
-    /> -->
+    />
   </div>
 </template>
 
@@ -527,13 +527,17 @@ import Cookies from 'js-cookie'
 import user_default from '@/assets/images/user_default.png'
 import { validEmail, validPhone } from '@/utils/validate'
 import { inject } from 'vue'
+import ImageCropper from '@/components/extra/ImageCropper'
 
 export default {
+  name: 'Accounts',
+  components: {
+    ImageCropper
+  },
   setup() {
     const appName = inject('appName')
     console.log(appName)
   },
-  name: 'Accounts',
   filters: {
     formatDatetime: function(value) {
       if (!value) return ''
@@ -913,6 +917,10 @@ export default {
               this.multiSelected = []
               this.onChangeInputSearch()
               this.loading_delete_all = false
+              this.$message({
+                type: 'success',
+                message: res.data.message
+              })
             })
             .catch((err) => {
               console.log(err)
@@ -985,6 +993,10 @@ export default {
               this.onChangeInputSearch()
               this.closeDetail()
               this.loadingVehicle = false
+			  this.$message({
+                type: 'success',
+                message: res.data.message
+              })
             })
             .catch((err) => {
               console.log(err)
@@ -992,8 +1004,8 @@ export default {
               this.onChangeInputSearch()
               this.loadingVehicle = false
               this.$message({
-                type: 'warning',
-                message: 'Có lỗi xảy ra vui lòng thử lại'
+                type: 'error',
+                message: err.data.message
               })
             })
         })
@@ -1024,7 +1036,7 @@ export default {
             phoneNumber: this.userInfo.phoneNumber.trim(),
             email: this.userInfo.email.trim(),
             gender: this.userInfo.gender,
-            birthday: this.userInfo.birthday.trim(),
+            birthday: this.userInfo.birthday,
             address: this.userInfo.address.trim(),
             role: this.userInfo.role
           }
@@ -1066,6 +1078,12 @@ export default {
         } else {
           return false
         }
+      })
+    },
+    resetUploadFile() {
+      this.uploadReady = false
+      this.$nextTick(() => {
+        this.uploadReady = true
       })
     },
 
