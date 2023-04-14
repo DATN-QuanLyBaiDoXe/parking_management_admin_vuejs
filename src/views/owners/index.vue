@@ -887,7 +887,8 @@ export default {
       })
     },
 
-    async viewVehicle(data) {
+    viewVehicle(data) {
+      this.dialogView = true
 	  const headers = {
         'Content-Type': 'application/json',
         Authorization: 'Bearer ' + Cookies.get('access-token')
@@ -897,8 +898,6 @@ export default {
         .then((response) => {
           if (response.data.status === 200 || response.data.status === 201) {
             this.vehicleList = response.data.data
-            this.dialogView = true
-            console.log(this.vehicleList)
           } else {
             this.$message({
               message: response.data.message,
