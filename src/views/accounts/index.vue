@@ -879,8 +879,8 @@ export default {
           console.log(err)
           this.loading = false
           this.$message({
-            type: 'error',
-            message: err.data.message
+            message: err.response.data.message,
+            type: 'error'
           })
         })
     },
@@ -927,9 +927,10 @@ export default {
               this.multiSelected = []
               this.onChangeInputSearch()
               this.loading_delete_all = false
+
               this.$message({
-                type: 'warning',
-                message: err.data.message
+                message: err.response.data.message,
+                type: 'error'
               })
             })
         })
@@ -1003,9 +1004,10 @@ export default {
               this.multiSelected = []
               this.onChangeInputSearch()
               this.loadingVehicle = false
+
               this.$message({
-                type: 'error',
-                message: err.data.message
+                message: err.response.data.message,
+                type: 'error'
               })
             })
         })
@@ -1073,7 +1075,10 @@ export default {
             })
             .catch((err) => {
               this.loadingVehicle = false
-              console.log(err)
+              this.$message({
+                message: err.response.data.message,
+                type: 'error'
+              })
             })
         } else {
           return false
@@ -1200,8 +1205,13 @@ export default {
                 this.resetDialog()
               }
             })
-            .catch(() => {
+            .catch((err) => {
               this.loading_add = false
+			  console.log('account ', err.response.data.message)
+              this.$message({
+                message: err.response.data.message,
+                type: 'error'
+              })
             })
         } else {
           return false

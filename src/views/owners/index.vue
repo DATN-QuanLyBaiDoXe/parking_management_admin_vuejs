@@ -96,7 +96,7 @@
             ><i class="el-icon-plus" /> Thêm phương tiện
             </el-button>
           </div>
-          <div class="action" style="margin-top: 15px;">
+          <div class="action" style="margin-top: 15px">
             <el-button
               type="danger"
               :loading="loadingVehicle"
@@ -105,8 +105,8 @@
             </el-button>
             <el-button
               type="default"
-              style="float: right; width: 170px; background-color: #D3D3D3"
-              @click="handleEdit(userDetail)"
+              style="float: right; width: 170px; background-color: #d3d3d3"
+              @click="viewVehicle(userDetail)"
             ><i class="el-icon-view" /> Xem phương tiện
             </el-button>
           </div>
@@ -130,23 +130,48 @@
       >
         <div class="block-item">
           <div class="item-mid">
-            <el-form-item style="margin-bottom: 21px" label="Họ và tên" prop="fullName">
-              <el-input v-model="userInfo.fullName" placeholder="Nhập họ và tên" />
+            <el-form-item
+              style="margin-bottom: 21px"
+              label="Họ và tên"
+              prop="fullName"
+            >
+              <el-input
+                v-model="userInfo.fullName"
+                placeholder="Nhập họ và tên"
+              />
             </el-form-item>
-            <el-form-item style="margin-bottom: 21px" label="Số điện thoại" prop="phoneNumber">
+            <el-form-item
+              style="margin-bottom: 21px"
+              label="Số điện thoại"
+              prop="phoneNumber"
+            >
               <el-input
                 v-model="userInfo.phoneNumber"
                 placeholder="Nhập số điện thoại"
               />
             </el-form-item>
-            <el-form-item style="margin-bottom: 21px" label="Địa chỉ" prop="address">
-              <el-input v-model="userInfo.address" type="textarea" :rows="3" placeholder="Nhập địa chỉ" maxlength="255" />
+            <el-form-item
+              style="margin-bottom: 21px"
+              label="Địa chỉ"
+              prop="address"
+            >
+              <el-input
+                v-model="userInfo.address"
+                type="textarea"
+                :rows="3"
+                placeholder="Nhập địa chỉ"
+                maxlength="255"
+              />
             </el-form-item>
           </div>
         </div>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button class="cancel-btn" type="info" @click="dialogAdd = false">Hủy</el-button>
+        <el-button
+          class="cancel-btn"
+          type="info"
+          @click="dialogAdd = false"
+        >Hủy</el-button>
         <el-button
           type="primary"
           :loading="loadingVehicle"
@@ -161,6 +186,7 @@
       :visible.sync="dialogEdit"
       width="500px"
       :close-on-click-modal="false"
+      @close="closeDialog('editForm')"
     >
       <el-form
         ref="editForm"
@@ -171,23 +197,48 @@
       >
         <div class="block-item">
           <div class="item-mid">
-            <el-form-item style="margin-bottom: 21px" label="Họ và tên" prop="fullName">
-              <el-input v-model="userInfo.fullName" placeholder="Nhập họ và tên" />
+            <el-form-item
+              style="margin-bottom: 21px"
+              label="Họ và tên"
+              prop="fullName"
+            >
+              <el-input
+                v-model="userInfo.fullName"
+                placeholder="Nhập họ và tên"
+              />
             </el-form-item>
-            <el-form-item style="margin-bottom: 21px" label="Số điện thoại" prop="phoneNumber">
+            <el-form-item
+              style="margin-bottom: 21px"
+              label="Số điện thoại"
+              prop="phoneNumber"
+            >
               <el-input
                 v-model="userInfo.phoneNumber"
                 placeholder="Nhập số điện thoại"
               />
             </el-form-item>
-            <el-form-item style="margin-bottom: 21px" label="Địa chỉ" prop="address">
-              <el-input v-model="userInfo.address" type="textarea" :rows="3" placeholder="Nhập địa chỉ" maxlength="255" />
+            <el-form-item
+              style="margin-bottom: 21px"
+              label="Địa chỉ"
+              prop="address"
+            >
+              <el-input
+                v-model="userInfo.address"
+                type="textarea"
+                :rows="3"
+                placeholder="Nhập địa chỉ"
+                maxlength="255"
+              />
             </el-form-item>
           </div>
         </div>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button class="cancel-btn" type="info" @click="dialogEdit = false">Hủy</el-button>
+        <el-button
+          class="cancel-btn"
+          type="info"
+          @click="dialogEdit = false"
+        >Hủy</el-button>
         <el-button
           type="primary"
           :loading="loadingVehicle"
@@ -202,17 +253,22 @@
       :visible.sync="dialogAddVehicle"
       width="500px"
       :close-on-click-modal="false"
+      @close="closeDialog('addVehicleForm')"
     >
       <el-form
         ref="addVehicleForm"
         :model="vehicleInfo"
-        :rules="rules"
+        :rules="rulesVehicle"
         label-position="top"
         label-width="200px"
       >
         <div class="block-item">
           <div class="item-mid">
-            <el-form-item style="margin-bottom: 21px" label="Loại phương tiện" prop="vehicleType">
+            <el-form-item
+              style="margin-bottom: 21px"
+              label="Loại phương tiện"
+              prop="vehicleType"
+            >
               <el-select
                 v-model="vehicleInfo.vehicleType"
                 placeholder="Chọn loại phương tiện"
@@ -226,29 +282,66 @@
                 />
               </el-select>
             </el-form-item>
-            <el-form-item style="margin-bottom: 21px" label="Thương hiệu" prop="brand">
+            <el-form-item
+              style="margin-bottom: 21px"
+              label="Thương hiệu"
+              prop="brand"
+            >
               <el-input v-model="vehicleInfo.brand" />
             </el-form-item>
-            <el-form-item style="margin-bottom: 21px" label="Màu sắc" prop="color">
-              <el-input
-                v-model="vehicleInfo.color"
-              />
+            <el-form-item
+              style="margin-bottom: 21px"
+              label="Màu sắc"
+              prop="color"
+            >
+              <el-input v-model="vehicleInfo.color" />
             </el-form-item>
-            <el-form-item style="margin-bottom: 21px" label="Biển số" prop="place">
+            <el-form-item
+              style="margin-bottom: 21px"
+              label="Biển số"
+              prop="place"
+            >
               <el-input v-model="vehicleInfo.place" maxlength="9" />
             </el-form-item>
           </div>
         </div>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button class="cancel-btn" type="info" @click="dialogEdit = false">Hủy</el-button>
+        <el-button
+          class="cancel-btn"
+          type="info"
+          @click="dialogAddVehicle = false"
+        >Hủy</el-button>
         <el-button
           type="primary"
-          :loading="loadingVehicle"
-          @click="editVehicle()"
+          :loading="loadingAddVehicle"
+          @click="addVehicle()"
         >Lưu
         </el-button>
       </div>
+    </el-dialog>
+
+    <el-dialog
+      title="Danh sách phương tiện"
+      :visible.sync="dialogView"
+      width="700px"
+      :close-on-click-modal="false"
+    >
+      <el-table :data="vehicleList">
+        <el-table-column label="STT" width="70">
+          <template slot-scope="scope">{{
+            scope.$index + 1
+          }}</template>
+        </el-table-column>
+        <el-table-column label="Loại phương tiện">
+          <template slot-scope="scope">{{
+            scope.row.vehicleType | getVehicleTypeName
+          }}</template>
+        </el-table-column>
+        <el-table-column prop="brand" label="Thương hiệu" />
+        <el-table-column prop="color" label="Màu sắc" />
+        <el-table-column prop="place" label="Biển số" />
+      </el-table>
     </el-dialog>
   </div>
 </template>
@@ -266,6 +359,17 @@ export default {
     console.log(appName)
   },
   name: 'Owners',
+  filters: {
+    getVehicleTypeName: function(value) {
+      let type = ''
+      if (!value) type = ''
+      if (value === 'CAR') type = 'Ô tô'
+      if (value === 'MOTO') type = 'Xe máy'
+      if (value === 'TRAM') type = 'Xe đạp điện'
+      if (value === 'BIKE') type = 'Xe đạp'
+      return type
+    }
+  },
   data() {
     const validateMobile = (rule, value, callback) => {
       if (value && !validPhone(value)) {
@@ -278,7 +382,9 @@ export default {
     return {
       loading: true,
       loadingVehicle: false,
+	  loadingAddVehicle: false,
       userList: [],
+	  vehicleList: [],
       multiSelected: [],
       allSelected: false,
       loading_delete_all: false,
@@ -286,6 +392,7 @@ export default {
       dialogEdit: false,
       dialogAdd: false,
 	  dialogAddVehicle: false,
+	  dialogView: false,
       queryPage: {
         page: 0,
         size: 10,
@@ -364,6 +471,24 @@ export default {
             trigger: 'blur'
           },
           { max: 255, message: 'Tối đa 255 ký tự', trigger: 'blur' }
+        ]
+      },
+	  rulesVehicle: {
+        vehicleType: [
+          {
+            required: true,
+            message: 'Loại phương tiện là bắt buộc',
+            trigger: 'blur'
+          }
+        //   { validator: vehicleType }
+        ],
+        place: [
+          {
+            required: true,
+            message: 'Biển số là bắt buộc',
+            trigger: 'blur'
+          },
+          { max: 9, message: 'Tối đa 9 ký tự', trigger: 'blur' }
         ]
       }
     }
@@ -445,8 +570,8 @@ export default {
           console.log(err)
           this.loading = false
           this.$message({
-            type: 'error',
-            message: err.data.message
+            message: err.response.data.message,
+            type: 'error'
           })
         })
     },
@@ -490,8 +615,8 @@ export default {
               this.onChangeInputSearch()
               this.loading_delete_all = false
               this.$message({
-                type: 'warning',
-                message: err.data.message
+                message: err.response.data.message,
+                type: 'error'
               })
             })
         })
@@ -566,8 +691,8 @@ export default {
               this.onChangeInputSearch()
               this.loadingVehicle = false
               this.$message({
-                type: 'error',
-                message: err.data.message
+                message: err.response.data.message,
+                type: 'error'
               })
             })
         })
@@ -630,6 +755,10 @@ export default {
             .catch((err) => {
               this.loadingVehicle = false
               console.log(err)
+			  this.$message({
+                message: err.response.data.message,
+                type: 'error'
+              })
             })
         } else {
           return false
@@ -685,8 +814,12 @@ export default {
                 this.resetDialog()
               }
             })
-            .catch(() => {
+            .catch((err) => {
               this.loading_add = false
+			  this.$message({
+                message: err.response.data.message,
+                type: 'error'
+              })
             })
         } else {
           return false
@@ -700,59 +833,86 @@ export default {
       this.$nextTick(() => {
         this.$refs['addVehicleForm'].clearValidate()
       })
-    }
+    },
 
-    // addVehicle() {
-    // //   this.vehicleInfo = this.$root.trimData(this.vehicleInfo)
-    //   this.$refs.addVehicleForm.validate((valid) => {
-    //     if (valid) {
-    //       const params = {
-    //         vehicleType: this.vehicleInfo.vehicleType.trim(),
-    //         place: this.vehicleInfo.place.trim(),
-    //         color: this.vehicleInfo.color.trim(),
-    //         brand: this.vehicleInfo.brand.trim(),
-    //         owner: this.vehicleInfo.ownerId
-    //       }
-    // 	  const headers = {
-    //         'Content-Type': 'application/json',
-    //         Authorization: 'Bearer ' + Cookies.get('access-token')
-    //       }
-    //       this.loadingVehicle = true
-    //       axios
-    //         .post(process.env.VUE_APP_API + 'vehicle/' + this.vehicleInfo.uuid, params, { headers })
-    //         .then((response) => {
-    //           if (response.data.status === 200 || response.data.status === 201) {
-    //             this.dialogAddVehicle = false
-    //             this.closeDetail()
-    //             this.getVehicle()
-    //             this.$message({
-    //               message: response.data.message,
-    //               type: 'success'
-    //             })
-    //           } else {
-    //             this.dialogAddVehicle = false
-    //             this.getVehicle()
-    //             this.$message({
-    //               message: response.data.message,
-    //               type: 'error'
-    //             })
-    //           }
-    //           this.loadingVehicle = false
-    //         })
-    //         .catch((err) => {
-    //           this.loadingVehicle = false
-    // 		  console.log(err)
-    //           // this.$notify({
-    //           //   title: "Lỗi",
-    //           //   message: "Sửa thất bại",
-    //           //   type: "error",
-    //           // });
-    //         })
-    //     } else {
-    //       return false
-    //     }
-    //   })
-    // }
+    addVehicle() {
+    //   this.vehicleInfo = this.$root.trimData(this.vehicleInfo)
+      this.$refs.addVehicleForm.validate((valid) => {
+        if (valid) {
+          const params = {
+            vehicleType: this.vehicleInfo.vehicleType.trim(),
+            place: this.vehicleInfo.place.trim(),
+            color: this.vehicleInfo.color.trim(),
+            brand: this.vehicleInfo.brand.trim(),
+            owner: this.vehicleInfo.ownerId
+          }
+    	  const headers = {
+            'Content-Type': 'application/json',
+            Authorization: 'Bearer ' + Cookies.get('access-token')
+          }
+          this.loadingAddVehicle = true
+          axios
+            .post(process.env.VUE_APP_API + 'vehicle', params, { headers })
+            .then((response) => {
+              console.log(response.data.data)
+              if (response.data.status === 200 || response.data.status === 201) {
+                this.dialogAddVehicle = false
+                this.closeDetail()
+                this.getUser()
+                this.$message({
+                  message: response.data.message,
+                  type: 'success'
+                })
+                this.loadingAddVehicle = false
+              } else {
+                this.dialogAddVehicle = false
+                this.getUser()
+                this.$message({
+                  message: response.data.message,
+                  type: 'error'
+                })
+              }
+              this.loadingAddVehicle = false
+            })
+            .catch((err) => {
+              this.$message({
+                message: err.response.data.message,
+                type: 'error'
+              })
+              this.loadingAddVehicle = false
+            })
+        } else {
+          return false
+        }
+      })
+    },
+
+    async viewVehicle(data) {
+	  const headers = {
+        'Content-Type': 'application/json',
+        Authorization: 'Bearer ' + Cookies.get('access-token')
+      }
+      axios
+        .get(process.env.VUE_APP_API + 'vehicle/owner/' + data.uuid, { headers })
+        .then((response) => {
+          if (response.data.status === 200 || response.data.status === 201) {
+            this.vehicleList = response.data.data
+            this.dialogView = true
+            console.log(this.vehicleList)
+          } else {
+            this.$message({
+              message: response.data.message,
+              type: 'error'
+            })
+          }
+        })
+        .catch((err) => {
+          this.$message({
+            message: err.response.data.message,
+            type: 'error'
+          })
+        })
+    }
   }
 }
 </script>

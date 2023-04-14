@@ -156,7 +156,7 @@
         <el-button class="cancel-btn" type="info" @click="dialogEdit = false">Hủy</el-button>
         <el-button
           type="primary"
-          :loading="loadingVehicle"
+          :loading="loadingVehicleEdit"
           @click="editVehicle()"
         >Lưu
         </el-button>
@@ -186,6 +186,7 @@ export default {
     return {
       loading: true,
       loadingVehicle: false,
+      loadingVehicleEdit: false,
       vehicleList: [],
       multiSelected: [],
       allSelected: false,
@@ -322,8 +323,8 @@ export default {
           console.log(err)
           this.loading = false
           this.$message({
-            type: 'error',
-            message: err.data.message
+            message: err.response.data.message,
+            type: 'error'
           })
         })
     },
@@ -371,8 +372,8 @@ export default {
               this.onChangeInputSearch()
               this.loading_delete_all = false
               this.$message({
-                type: 'error',
-                message: err.data.message
+                message: err.response.data.message,
+                type: 'error'
               })
             })
         })
@@ -447,8 +448,8 @@ export default {
               this.onChangeInputSearch()
               this.loadingVehicle = false
               this.$message({
-                type: 'error',
-                message: 'Có lỗi xảy ra vui lòng thử lại'
+                message: err.response.data.message,
+                type: 'error'
               })
             })
         })
@@ -485,7 +486,7 @@ export default {
             'Content-Type': 'application/json',
             Authorization: 'Bearer ' + Cookies.get('access-token')
           }
-          this.loadingVehicle = true
+          this.loadingVehicleEdit = true
           axios
             .put(process.env.VUE_APP_API + 'vehicle/' + this.vehicleInfo.uuid, params, { headers })
             .then((response) => {
@@ -505,16 +506,14 @@ export default {
                   type: 'error'
                 })
               }
-              this.loadingVehicle = false
+              this.loadingVehicleEdit = false
             })
             .catch((err) => {
-              this.loadingVehicle = false
-			  console.log(err)
-              // this.$notify({
-              //   title: "Lỗi",
-              //   message: "Sửa thất bại",
-              //   type: "error",
-              // });
+              this.loadingVehicleEdit = false
+              this.$message({
+                message: err.response.data.message,
+                type: 'error'
+              })
             })
         } else {
           return false
