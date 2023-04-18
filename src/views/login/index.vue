@@ -63,7 +63,7 @@
         type="primary"
         style="width: 100%; margin-bottom: 30px"
         @click="handleLogin"
-      >Login</el-button>
+      >Đăng nhập</el-button>
 
       <!-- <div style="position:relative">
         <div class="tips">
@@ -119,7 +119,7 @@ export default {
     return {
       loginForm: {
         username: 'admin',
-        password: '111111'
+        password: '123456'
       },
       loginRules: {
         username: [

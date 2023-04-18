@@ -46,8 +46,7 @@
             }}</template>
           </el-table-column>
           <el-table-column prop="place" label="Biển số" />
-          <el-table-column prop="color" label="Màu sắc" />
-          <el-table-column prop="brand" label="Thương hiệu" />
+          <el-table-column prop="ownerName" label="Chủ sở hữu" />
         </el-table>
         <el-pagination
           :current-page.sync="queryPage.page"

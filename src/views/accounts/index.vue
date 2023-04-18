@@ -1056,6 +1056,7 @@ export default {
                 response.data.status === 201
               ) {
                 this.dialogEdit = false
+                this.closeDetail()
                 this.getUser()
                 this.$message({
                   message: response.data.message,
@@ -1188,7 +1189,7 @@ export default {
               if (response.data.status === 200 || response.data.status === 201) {
                 this.$message({
                   type: 'success',
-                  message: 'Thêm mới thành công'
+                  message: response.data.message
                 })
                 this.dialogAdd = false
                 this.getUser()
@@ -1207,7 +1208,6 @@ export default {
             })
             .catch((err) => {
               this.loading_add = false
-			  console.log('account ', err.response.data.message)
               this.$message({
                 message: err.response.data.message,
                 type: 'error'

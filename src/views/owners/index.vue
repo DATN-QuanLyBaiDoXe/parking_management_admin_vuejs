@@ -735,6 +735,7 @@ export default {
                 response.data.status === 201
               ) {
                 this.dialogEdit = false
+                this.closeDetail()
                 this.getUser()
                 this.$message({
                   message: response.data.message,
