@@ -374,7 +374,7 @@ export default {
         page: 0,
         size: 10,
         total: 0,
-        startDate: '2022-04-18T00:00:00',
+        startDate: '',
         endDate: '',
         objectType: ['CAR', 'MOTO', 'TRAM'],
         eventType: ['IN', 'OUT'],
