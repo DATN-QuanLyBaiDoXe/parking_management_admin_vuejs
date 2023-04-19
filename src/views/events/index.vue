@@ -9,21 +9,19 @@
         prefix-icon="el-icon-search"
         @change="onChangeInputSearch"
       /> -->
-      <div class="">
-        <el-input
-          v-model="queryPage.search"
-          class="input-search"
-          placeholder="Tìm kiếm"
-          prefix-icon="el-icon-search"
-          @keyup.enter.native="handleFilter()"
-          @change="onChangeInputSearch"
-        />
-        <Search
-          :key="flagKeySearch"
-          :search-event="searchData"
-          @clicked="onClickChild"
-        />
-      </div>
+      <el-input
+        v-model="queryPage.search"
+        class="input-search"
+        placeholder="Tìm kiếm"
+        prefix-icon="el-icon-search"
+        @keyup.enter.native="handleFilter()"
+        @change="onChangeInputSearch"
+      />
+      <Search
+        :key="flagKeySearch"
+        :search-event="searchData"
+        @clicked="onClickChild"
+      />
       <el-button
         class="btn-add"
         type="primary"
@@ -208,12 +206,12 @@
               />
             </el-form-item> -->
             <el-form-item label="Hình ảnh">
-              // <UploadImage
-              //   :key="flagUpload"
-              //   :list-image="listFile"
-              //   @removeUploadImage="removeUploadImageHandle"
-              //   @getListFile="getListFile"
-              // />
+              <UploadImage
+                :key="flagUpload"
+                :list-image="listFile"
+                @removeUploadImage="removeUploadImageHandle"
+                @getListFile="getListFile"
+              />
             </el-form-item>
             <el-form-item style="margin-bottom: 21px" label="Ghi chú" prop="description">
               <el-input v-model="eventInfo.description" type="textarea" rows="3" />
@@ -391,16 +389,23 @@ export default {
       queryPage: {
         page: 0,
         size: 10,
-        total: 0
-      },
-      searchData: {
+        total: 0,
+        search: '',
         startDate: '',
         endDate: '',
-        objectType: ['CAR', 'MOTO', 'TRAM'],
-        eventType: ['IN', 'OUT'],
-        sourceType: ['MANUAL', 'AUTO'],
-        search: ''
+        objectType: [],
+        eventType: [],
+        sourceType: [],
+        status: []
       },
+	  searchData: {
+        startDate: '',
+        endDate: '',
+        objectType: [],
+        eventType: [],
+        sourceType: [],
+        status: []
+	  },
       user: {
         uuid: '',
         username: '',
@@ -604,56 +609,43 @@ export default {
     handleSelectionChange(val) {
       this.multiSelected = val
     },
+    getListFile(listFile) {
+      this.listFile = listFile
+    },
 
     resetFilter() {
       this.flagKeySearch = Math.floor(Math.random() * 999999)
-      this.query = {
+      this.queryPage = {
         page: 0,
         size: 10,
         startDate: moment().subtract(60, 'day').format('YYYY-MM-DDT00:00:00'),
         endDate: moment().endOf('day').format('YYYY-MM-DDTHH:mm:ss'),
         search: '',
-        objectType: ['CAR', 'MOTO', 'TRAM'],
-        eventType: ['IN', 'OUT'],
-        sourceType: ['MANUAL', 'AUTO']
+        objectType: [],
+        eventType: [],
+        sourceType: []
       }
       this.closeDetail()
-      this.searchKeyword = ''
+      this.getUser()
+    },
+
+    handleFilter() {
+      if (this.queryPage.search) {
+        this.queryPage.search = this.queryPage.search.trim()
+      }
+      this.queryPage.page = 0
       this.getUser()
     },
 
     onClickChild(value) {
-      // if (value) {
-      //   this.query.fromDate = value.startDate
-      //   this.query.toDate = value.endDate
-      //   // this.query.plate = value.plate;
-      //   this.query.processStatus = value.status
-      //   this.query.violationType = value.violationType
-      //   this.query.objectType = value.objectType
-      //   this.query.status = value.status
-      //   this.query.eventStatus = value.status
-      //   this.query.eventCode = value.violationType
-      //   this.query.reportStatus = value.reportStatus
-      //   this.query.site = value.site
-      //   this.query.objectName = value.objectName
-      //   this.query.sourceType = value.sourceType
-      //   if (value.camera != null && value.camera != '') {
-      //     this.query.filterObjectType = 'cam'
-      //     this.query.objectName = 'cam'
-      //     this.query.filterObjectIds = value.camera
-      //   } else if (value.camera == '' && value.site != '') {
-      //     this.query.filterObjectType = 'site'
-      //     this.query.filterObjectIds = value.site
-      //   } else {
-      //     this.query.filterObjectType = 'cam'
-      //     this.query.filterObjectIds = ''
-      //   }
-      //   if (value.manual) {
-      //     this.query.manual = value.manual
-      //   } else {
-      //     this.query.manual = ''
-      //   }
-      // }
+      if (value) {
+        this.queryPage.startDate = value.startDate
+        this.queryPage.endDate = value.endDate
+        this.queryPage.eventType = value.eventType
+        this.queryPage.sourceType = value.sourceType
+        this.queryPage.status = value.status
+        this.queryPage.objectType = value.objectType
+      }
       this.handleFilter()
     },
 
@@ -669,13 +661,14 @@ export default {
         search: this.queryPage.search,
         startDate: this.queryPage.startDate == ''
           ? moment(new Date()).format('YYYY-MM-DDT00:00:00')
-          : moment(this.queryPage.startDate).format('YYYY-MM-DDTHH:MM:SS'),
+          : moment(this.queryPage.startDate).format('YYYY-MM-DDTHH:mm:ss'),
         endDate: this.queryPage.endDate == ''
           ? moment(new Date()).format('YYYY-MM-DDT23:59:59')
-          : moment(this.queryPage.endDate).format('YYYY-MM-DDTHH:MM:SS'),
-        objectType: this.queryPage.objectType,
+          : moment(this.queryPage.endDate).format('YYYY-MM-DDTHH:mm:ss'),
+        objectType: this.queryPage.objectType ? this.queryPage.objectType : [],
         eventType: this.queryPage.eventType,
-        sourceType: this.queryPage.sourceType
+        sourceType: this.queryPage.sourceType,
+        status: this.queryPage.status ? this.queryPage.status : []
       }
       axios
         .post(process.env.VUE_APP_API + 'management', params, { headers })

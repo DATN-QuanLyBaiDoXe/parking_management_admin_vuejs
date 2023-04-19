@@ -10,120 +10,81 @@
     >
       <div class="search-form-content">
         <el-form ref="formSearch" :model="filter" :rules="rules">
-          <el-form-item label="Thời gian" prop="date">
+          <el-form-item label="Thời gian phát hiện" prop="date">
             <el-date-picker
               v-model="filter.date"
               type="datetimerange"
               :clearable="false"
               range-separator="-"
               start-placeholder="Bắt đầu"
-              format="yyyy-MM-dd HH:mm:ss"
+              format="dd/MM/yyyy HH:mm:ss"
               end-placeholder="Kết thúc"
             />
+            <!-- :picker-options="datePickerOptions" -->
           </el-form-item>
-          <el-form-item label="Vị trí">
+          <el-form-item label="Loại sự kiện">
+            <el-select v-model="filter.eventType" clearable placeholder="Chọn loại sự kiện">
+              <el-option
+                v-for="type in eventTypeList"
+                :key="type.value"
+                :label="type.label"
+                :value="type.value"
+              />
+            </el-select>
+          </el-form-item>
+          <el-form-item label="Loại đối tượng">
             <el-select
-              v-model="filter.sites"
+              v-model="filter.objectType"
               multiple
               filterable
               clearable
               collapse-tags
-              :class="{ multi: filter.sites && filter.sites.length > 1 }"
+              :class="{ multi: filter.objectType && filter.objectType.length > 1 }"
               class="site-search-popup"
-              placeholder="Chọn vị trí"
+              placeholder="Chọn loại đối tượng"
             >
               <el-option
-                v-for="item in siteLst"
-                :key="item.siteId"
-                :label="item.siteName"
-                :value="item.siteId"
+                v-for="type in objectTypeList"
+                :key="type.value"
+                :label="type.label"
+                :value="type.value"
               />
             </el-select>
           </el-form-item>
           <el-form-item label="Nguồn phát hiện">
-            <el-select v-model="filter.sourceType" placeholder="Lựa chọn">
+            <el-select v-model="filter.sourceType" clearable placeholder="Chọn nguồn phát hiện">
               <el-option
-                v-for="item in sourceObjectList"
-                :key="item.val"
-                :label="item.name"
-                :value="item.val"
+                v-for="type in sourceTypeList"
+                :key="type.value"
+                :label="type.label"
+                :value="type.value"
               />
             </el-select>
           </el-form-item>
-          <el-form-item label="Thiết bị phát hiện">
-            <el-select
-              v-model="filter.cameras"
-              multiple
-              filterable
-              clearable
-              collapse-tags
-              :class="{ multi: filter.cameras && filter.cameras.length > 1 }"
-              class="site-search-popup"
-              placeholder="Chọn nguồn"
-            >
-              <el-option
-                v-for="item in cameraLst"
-                :key="item.id"
-                :label="item.name"
-                :value="item.id"
-              />
-            </el-select>
-          </el-form-item>
-          <el-row :gutter="20">
-            <el-col
-              :span="24"
-            ><div class="grid-content bg-purple">
-              <el-form-item label="Loại sự kiện">
-                <el-select
-                  v-model="filter.violationTypes"
-                  clearable
-                  multiple
-                  filterable
-                  collapse-tags
-                  :class="{ multi: filter.violationTypes && filter.violationTypes.length > 1 }"
-                  placeholder="Tất cả"
-                >
-                  <el-option
-                    v-for="tmpType in violationTypeLst"
-                    :key="tmpType.id"
-                    :label="tmpType.name"
-                    :value="tmpType.code"
-                  />
-                </el-select>
-              </el-form-item></div></el-col>
-          </el-row>
           <el-row :gutter="20">
             <el-col :span="24">
               <div class="grid-content bg-purple">
                 <el-form-item label="Trạng thái">
                   <el-select
                     v-model="filter.status"
+                    multiple
+                    filterable
                     clearable
+                    collapse-tags
+                    :class="{ multi: filter.status && filter.status.length > 1 }"
+                    class="site-search-popup"
                     placeholder="Chọn trạng thái"
                   >
                     <el-option
-                      v-for="tmpType in statusLst"
-                      :key="tmpType.code"
-                      :label="tmpType.name"
-                      :value="tmpType.id"
-                    />
-                  </el-select>
-                </el-form-item></div></el-col>
-          </el-row>
-          <el-row :gutter="20">
-            <el-col :span="24">
-              <div class="grid-content bg-purple">
-                <el-form-item label="Trạng thái kiểm duyệt">
-                  <el-select v-model="filter.reportStatus" placeholder="Lựa chọn">
-                    <el-option
-                      v-for="item in statusListCheck"
-                      :key="item.val"
-                      :label="item.name"
-                      :value="item.val"
+                      v-for="type in statusList"
+                      :key="type.value"
+                      :label="type.label"
+                      :value="type.value"
                     />
                   </el-select>
                 </el-form-item>
-              </div></el-col>
+              </div>
+            </el-col>
           </el-row>
           <el-form-item class="action">
             <el-button
@@ -143,8 +104,6 @@
 <script type="text/javascript">
 import filter_icon from '@/assets/images/filter.png'
 import moment from 'moment'
-import Cookies from 'js-cookie'
-import axios from 'axios'
 
 export default {
   props: {
@@ -159,63 +118,15 @@ export default {
       visible: false,
       loading: false,
       eventHandMade: false,
-      siteLst: [],
-      cameraLst: [],
-      vehicleTypeLst: [],
-      statusLst: [],
-      statusListCheck: [
-        {
-          val: '',
-          name: 'Tất cả'
-        },
-        {
-          val: false,
-          name: 'Chưa kiểm duyệt'
-        },
-        {
-          val: true,
-          name: 'Đã kiểm duyệt'
-        }
-      ],
-      sourceObjectList: [
-        {
-          val: '',
-          name: 'Tất cả'
-        },
-        {
-          val: 'AUTO',
-          name: 'Tự động'
-        },
-        {
-          val: 'MANUAL',
-          name: 'Thủ công'
-        }
-      ],
-      statusListEvent: {
-        NOT_SEEN: 1,
-        VERIFICATION: 2,
-        PROCESSING: 3,
-        PROCESSED: 4,
-        INCORRECT: 5
-      },
-      groupsList: [],
-      violationTypeLst: [],
-      exceptViolation: [],
-      objectTypeLst: [],
       filter: {
-        status: null,
-        manual: null,
-        violationTypes: null,
-        objectType: null,
         date: [
           moment().subtract(30, 'day').startOf('day').format('YYYY-MM-DD HH:mm:ss'),
           moment().endOf('day').format('YYYY-MM-DD HH:mm:ss')
         ],
-        sites: [],
-        cameras: [],
-        group: null,
-        reportStatus: '',
-        sourceType: ''
+        eventType: [],
+        objectType: [],
+        sourceType: [],
+        status: []
       },
       rules: {
         date: [
@@ -225,126 +136,105 @@ export default {
             trigger: 'blur'
           }
         ]
-      }
+      },
+      datePickerOptions: {
+        disabledDate(date) {
+          return date > moment().valueOf()
+        }
+      },
+	  eventTypeList: [
+        {
+          value: 'IN',
+          label: 'Vào'
+        },
+        {
+          value: 'OUT',
+          label: 'Ra'
+        }
+      ],
+      objectTypeList: [
+        {
+          value: 'CAR',
+          label: 'Ô tô'
+        },
+        {
+          value: 'MOTO',
+          label: 'Xe máy'
+        },
+        {
+          value: 'TRAM',
+          label: 'Xe đạp điện'
+        },
+        {
+          value: 'BIKE',
+          label: 'Xe đạp'
+        }
+      ],
+      sourceTypeList: [
+        {
+          value: 'AUTO',
+          label: 'Nguồn tự động'
+        },
+        {
+          value: 'MANUAL',
+          label: 'Nguồn thủ công'
+        }
+      ],
+      statusList: [
+        {
+          value: 'NOT_SEEN',
+          label: 'Chưa xem'
+        },
+        {
+          value: 'VERIFICATION',
+          label: 'Xác minh sự kiện'
+        },
+        {
+          value: 'PROCESSING',
+          label: 'Đang xử lý'
+        },
+        {
+          value: 'PROCESSED',
+          label: 'Đã xử lý'
+        },
+        {
+          value: 'WRONG',
+          label: 'Báo sai'
+        }
+      ]
     }
   },
   created() {
     this.init()
   },
-  mounted() {
-    this.handleRedirectNotify()
-  },
   methods: {
     async init() {
-      console.log('this.search', this.searchEvent)
       if (this.searchEvent && this.searchEvent.fromDate && this.searchEvent.toDate) {
         this.filter.date = [this.searchEvent.fromDate, this.searchEvent.toDate]
       }
-      if (this.searchEvent && this.searchEvent.site) {
-        this.filter.sites = [this.searchEvent.site]
+      if (this.searchEvent && this.searchEvent.eventType) {
+        this.filter.eventType = [this.searchEvent.eventType]
       }
-      if (this.searchEvent && this.searchEvent.eventTypeList) {
-        this.filter.violationTypes = this.searchEvent.eventTypeList
+      if (this.searchEvent && this.searchEvent.objectType) {
+        this.filter.objectType = [this.searchEvent.objectType]
       }
-      // this.getSiteList()
-      // this.getCameraList()
-      // this.getViolationTypeList()
-    },
-    handleRedirectNotify() {
-      let shiftInfo = localStorage.getItem('shiftNotify')
-      if (shiftInfo) {
-        shiftInfo = JSON.parse(shiftInfo)
-        this.filter.date = [shiftInfo.startTime, shiftInfo.endTime]
-        this.filter.status = this.statusListEvent[shiftInfo.status]
-        localStorage.removeItem('shiftNotify')
-        this.search()
+      if (this.searchEvent && this.searchEvent.sourceType) {
+        this.filter.sourceType = [this.searchEvent.sourceType]
+      }
+      if (this.searchEvent && this.searchEvent.status) {
+        this.filter.status = [this.searchEvent.status]
       }
     },
-    // async getSiteList() {
-    //   const queryCustom = {
-    //     page: 0,
-    //     size: 2000
-    //   }
-    //   const result = await siteResource.list(queryCustom)
-    //   if (result && result.data) {
-    //     this.siteLst = result.data
-    //   }
-    // },
-    // async getCameraList() {
-    //   const siteIds = []
-    //   this.filter.sites.map((site) => {
-    //     siteIds.push(site)
-    //   })
-    //   const queryCustom = {
-    //     page: 0,
-    //     size: 10000
-    //   }
-    //   const result = await cameraResource.list(queryCustom)
-    //   if (result && result.data) {
-    //     this.cameraLst = result.data
-    //   } else {
-    //     this.cameraLst = []
-    //   }
-    //   this.filter.cameras = []
-    // },
-    // async getObjectTypeList() {
-    //   const queryCustom = {
-    //     catType: 'OBJECT_TYPE_GSAN'
-    //   }
-    //   const result = await categoryResource.list(queryCustom)
-    //   if (result && result.data) {
-    //     this.objectTypeLst = result.data
-    //     this.objectTypeLst.unshift({ code: null, id: '', name: 'Tất cả' })
-    //   }
-    // },
-    // async statusList() {
-    //   const result = await statusResource.list()
-    //   if (result && result.data) {
-    //     this.statusLst = result.data
-    //     this.statusLst.unshift({ value: 'Tất cả', name: null })
-    //   }
-    // },
-    // async getGroupList() {
-    //   const queryCustom = {
-    //     page: 0,
-    //     size: 1000
-    //   }
-    //   const { data } = await groupsResource.list(queryCustom)
-    //   if (data) {
-    //     this.groupsList = data
-    //     this.groupsList.unshift({ uuid: null, name: 'Tất cả' })
-    //   } else {
-    //     this.groupsList = []
-    //   }
-    // },
-    // async getViolationTypeList() {
-    //   const queryCustom = {
-    //     catType: 'EVENT'
-    //   }
-    //   const self = this
-    //   const result = await categoryResource.list(queryCustom)
-    //   if (result && result.data) {
-    //     this.violationTypeLst = result.data.filter(function(val) {
-    //       return !self.exceptViolation.includes(val.code)
-    //     })
-    //     // this.violationTypeLst.unshift({ id: '', code: null, name: 'Tất cả' })
-    //   }
-    // },
     search() {
       this.$refs.formSearch.validate((valid) => {
         if (valid) {
           const queryCustom = {
             startDate: '',
             endDate: '',
-            site: null,
-            manual: null,
-            reportStatus: this.filter.reportStatus ? true : this.filter.reportStatus === false ? false : '',
-            objectName: this.eventHandMade ? 'manual' : 'all',
-            camera: null,
-            status: this.filter.status ? this.filter.status : '',
-            // violationType: this.filter.violationType ? this.filter.violationType : '',
-            objectType: this.filter.objectType ? this.filter.objectType : '',
-            sourceType: this.filter.sourceType
+            status: this.filter.status ? this.filter.status : [],
+            objectType: this.filter.objectType ? this.filter.objectType : [],
+            sourceType: this.filter.sourceType ? this.filter.sourceType : [],
+            eventType: this.filter.eventType ? this.filter.eventType : []
           }
           if (this.filter.date) {
             const startDate = moment(this.filter.date[0]).format(
@@ -356,24 +246,25 @@ export default {
             queryCustom.startDate = startDate
             queryCustom.endDate = endDate
           }
-          if (this.filter.sites && this.filter.sites.length > 0) {
-            queryCustom.site = this.filter.sites.toString()
+          if (this.filter.eventType && this.filter.eventType.length > 0) {
+            queryCustom.eventType = this.filter.eventType
           } else {
-            queryCustom.site = ''
+            queryCustom.eventType = []
           }
-          if (this.filter.cameras && this.filter.cameras.length > 0 && !this.eventHandMade) {
-            queryCustom.camera = this.filter.cameras.toString()
+          if (this.filter.sourceType && this.filter.sourceType.length > 0) {
+            queryCustom.sourceType = this.filter.sourceType
           } else {
-            queryCustom.camera = ''
+            queryCustom.sourceType = []
           }
-          if (this.filter.violationTypes && this.filter.violationTypes.length > 0) {
-            queryCustom.violationType = this.filter.violationTypes.toString()
+          if (this.filter.objectType && this.filter.objectType.length > 0) {
+            queryCustom.objectType = this.filter.objectType
           } else {
-            queryCustom.violationType = ''
+            queryCustom.objectType = []
           }
-          if (this.eventHandMade) {
-            queryCustom.camera = ''
-            queryCustom.manual = this.filter.manual
+          if (this.filter.status && this.filter.status.length > 0) {
+            queryCustom.status = this.filter.status
+          } else {
+            queryCustom.status = []
           }
           this.visible = false
           this.$emit('clicked', queryCustom)
@@ -385,18 +276,14 @@ export default {
     refresh() {
       this.eventHandMade = false
       this.filter = {
-        plate: null,
-        vehicleType: null,
-        violationTypes: null,
         date: [
           moment().subtract(2, 'day').startOf('day').format('YYYY-MM-DD HH:mm:ss'),
           moment().endOf('day').format('YYYY-MM-DD HH:mm:ss')
         ],
-        sites: [],
-        cameras: [],
-        group: null,
-        status: null,
-        sourceType: ''
+        objectType: [],
+        eventType: [],
+        sourceType: [],
+        status: []
       }
     }
   }
