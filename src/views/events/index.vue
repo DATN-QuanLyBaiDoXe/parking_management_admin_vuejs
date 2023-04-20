@@ -283,12 +283,12 @@
               />
             </el-form-item> -->
             <el-form-item label="Hình ảnh">
-              // <UploadImage
-              //   :key="flagUpload"
-              //   :list-image="listFile"
-              //   @removeUploadImage="removeUploadImageHandle"
-              //   @getListFile="getListFile"
-              // />
+              <UploadImage
+                :key="flagUpload"
+                :list-image="listFile"
+                @removeUploadImage="removeUploadImageHandle"
+                @getListFile="getListFile"
+              />
             </el-form-item>
             <el-form-item style="margin-bottom: 21px" label="Ghi chú" prop="description">
               <el-input v-model="eventInfo.description" type="textarea" rows="3" />
@@ -398,14 +398,14 @@ export default {
         sourceType: [],
         status: []
       },
-	  searchData: {
+      searchData: {
         startDate: '',
         endDate: '',
         objectType: [],
         eventType: [],
         sourceType: [],
         status: []
-	  },
+      },
       user: {
         uuid: '',
         username: '',
@@ -618,7 +618,7 @@ export default {
       this.queryPage = {
         page: 0,
         size: 10,
-        startDate: moment().subtract(60, 'day').format('YYYY-MM-DDT00:00:00'),
+        startDate: moment().subtract(3, 'day').format('YYYY-MM-DDT00:00:00'),
         endDate: moment().endOf('day').format('YYYY-MM-DDTHH:mm:ss'),
         search: '',
         objectType: [],
@@ -641,8 +641,8 @@ export default {
       if (value) {
         this.queryPage.startDate = value.startDate
         this.queryPage.endDate = value.endDate
-        this.queryPage.eventType = value.eventType
-        this.queryPage.sourceType = value.sourceType
+        this.queryPage.eventType = value.eventType && value.eventType.length > 0 ? [value.eventType] : []
+        this.queryPage.sourceType = value.sourceType && value.sourceType.length > 0 ? [value.sourceType] : []
         this.queryPage.status = value.status
         this.queryPage.objectType = value.objectType
       }
@@ -655,20 +655,20 @@ export default {
         'Content-Type': 'application/json',
         Authorization: 'Bearer ' + Cookies.get('access-token')
       }
-	  const params = {
+	    const params = {
         page: this.queryPage.page > 0 ? this.queryPage.page - 1 : 0,
         size: this.queryPage.size,
         search: this.queryPage.search,
         startDate: this.queryPage.startDate == ''
-          ? moment(new Date()).format('YYYY-MM-DDT00:00:00')
+          ? moment().subtract(3, 'day').format('YYYY-MM-DDT00:00:00')
           : moment(this.queryPage.startDate).format('YYYY-MM-DDTHH:mm:ss'),
         endDate: this.queryPage.endDate == ''
           ? moment(new Date()).format('YYYY-MM-DDT23:59:59')
           : moment(this.queryPage.endDate).format('YYYY-MM-DDTHH:mm:ss'),
-        objectType: this.queryPage.objectType ? this.queryPage.objectType : [],
+        objectType: this.queryPage.objectType,
         eventType: this.queryPage.eventType,
         sourceType: this.queryPage.sourceType,
-        status: this.queryPage.status ? this.queryPage.status : []
+        status: this.queryPage.status
       }
       axios
         .post(process.env.VUE_APP_API + 'management', params, { headers })
@@ -821,7 +821,7 @@ export default {
     handleCreate() {
       this.resetDialog()
       this.dialogAdd = true
-	  this.eventInfo.gender = 0
+	    this.eventInfo.gender = 0
     },
 
     handleEdit(data) {

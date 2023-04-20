@@ -23,7 +23,11 @@
             <!-- :picker-options="datePickerOptions" -->
           </el-form-item>
           <el-form-item label="Loại sự kiện">
-            <el-select v-model="filter.eventType" clearable placeholder="Chọn loại sự kiện">
+            <el-select
+              v-model="filter.eventType"
+              clearable
+              placeholder="Chọn loại sự kiện"
+            >
               <el-option
                 v-for="type in eventTypeList"
                 :key="type.value"
@@ -120,7 +124,7 @@ export default {
       eventHandMade: false,
       filter: {
         date: [
-          moment().subtract(30, 'day').startOf('day').format('YYYY-MM-DD HH:mm:ss'),
+          moment().subtract(3, 'day').startOf('day').format('YYYY-MM-DD HH:mm:ss'),
           moment().endOf('day').format('YYYY-MM-DD HH:mm:ss')
         ],
         eventType: [],
@@ -213,17 +217,19 @@ export default {
         this.filter.date = [this.searchEvent.fromDate, this.searchEvent.toDate]
       }
       if (this.searchEvent && this.searchEvent.eventType) {
-        this.filter.eventType = [this.searchEvent.eventType]
+        this.filter.eventType = this.searchEvent.eventType
       }
       if (this.searchEvent && this.searchEvent.objectType) {
-        this.filter.objectType = [this.searchEvent.objectType]
+        this.filter.objectType = this.searchEvent.objectType
       }
       if (this.searchEvent && this.searchEvent.sourceType) {
         this.filter.sourceType = [this.searchEvent.sourceType]
       }
       if (this.searchEvent && this.searchEvent.status) {
-        this.filter.status = [this.searchEvent.status]
+        this.filter.status = this.searchEvent.status
       }
+      console.log('filter   ', this.filter)
+      console.log('search   ', this.searchEvent)
     },
     search() {
       this.$refs.formSearch.validate((valid) => {
@@ -277,7 +283,7 @@ export default {
       this.eventHandMade = false
       this.filter = {
         date: [
-          moment().subtract(2, 'day').startOf('day').format('YYYY-MM-DD HH:mm:ss'),
+          moment().subtract(3, 'day').startOf('day').format('YYYY-MM-DD HH:mm:ss'),
           moment().endOf('day').format('YYYY-MM-DD HH:mm:ss')
         ],
         objectType: [],
