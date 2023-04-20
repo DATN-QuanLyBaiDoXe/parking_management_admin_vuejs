@@ -185,14 +185,12 @@ export default {
           axios
             .post(process.env.VUE_APP_API + 'user/login', this.loginForm)
             .then((res) => {
-              setToken()
+              const tokenValue = res.data.data.role === 1 ? 'admin-token' : 'editor-token'
+              setToken(tokenValue)
               Cookies.set('access-token', res.data.data.accessToken, {
                 expires: 7
               })
-              Cookies.set('userInfo', JSON.stringify(res.data.data), {
-                expires: 7
-              })
-              console.log(JSON.parse(Cookies.get('userInfo')))
+              Cookies.set('userInfo', JSON.stringify(res.data.data))
               self.$router.push({
                 path: this.redirect || '/',
                 query: this.otherQuery

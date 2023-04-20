@@ -68,6 +68,21 @@ const constantRoutes = [
 ]
 
 const asyncRoutes = [
+  {
+    path: '/vehicles',
+    component: 'layout/Layout',
+    meta: {
+      roles: ['admin']
+    },
+    children: [
+		  {
+        path: 'index',
+        component: () => import('@/views/vehicles/index'),
+        name: 'Vehicles',
+        meta: { title: 'Quản lý phương tiện', icon: 'el-icon-truck', roles: ['admin'] }
+		  }
+    ]
+	  },
   { path: '*', redirect: '/404', hidden: true }
 ]
 

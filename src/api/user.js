@@ -1,3 +1,4 @@
+import { getToken } from '@/utils/auth'
 import request from '@/utils/request'
 
 export function login(data) {
@@ -9,6 +10,7 @@ export function login(data) {
 }
 
 export function getInfo(token) {
+  token = getToken()
   return request({
     url: '/vue-element-admin/user/info',
     method: 'get',

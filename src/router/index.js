@@ -69,42 +69,6 @@ export const constantRoutes = [
     ]
   },
   {
-    path: '/accounts',
-    component: Layout,
-    children: [
-      {
-        path: 'index',
-        component: () => import('@/views/accounts/index'),
-        name: 'Accounts',
-        meta: { title: 'Quản lý tài khoản', icon: 'el-icon-user-solid', affix: true }
-      }
-    ]
-  },
-  {
-    path: '/owners',
-    component: Layout,
-    children: [
-      {
-        path: 'index',
-        component: () => import('@/views/owners/index'),
-        name: 'Owners',
-        meta: { title: 'Quản lý chủ sở hữu', icon: 'el-icon-s-flag', affix: true }
-      }
-    ]
-  },
-  {
-    path: '/vehicles',
-    component: Layout,
-    children: [
-      {
-        path: 'index',
-        component: () => import('@/views/vehicles/index'),
-        name: 'Vehicles',
-        meta: { title: 'Quản lý phương tiện', icon: 'el-icon-truck', affix: true }
-      }
-    ]
-  },
-  {
     path: '/events',
     component: Layout,
     children: [
@@ -149,47 +113,84 @@ export const constantRoutes = [
  * the routes that need to be dynamically loaded based on user roles
  */
 export const asyncRoutes = [
-//   {
-//     path: '/permission',
-//     component: Layout,
-//     redirect: '/permission/page',
-//     alwaysShow: true, // will always show the root menu
-//     name: 'Permission',
-//     meta: {
-//       title: 'Permission',
-//       icon: 'lock',
-//       roles: ['admin', 'editor'] // you can set roles in root nav
-//     },
-//     children: [
-//       {
-//         path: 'page',
-//         component: () => import('@/views/permission/page'),
-//         name: 'PagePermission',
-//         meta: {
-//           title: 'Page Permission',
-//           roles: ['admin'] // or you can only set roles in sub nav
-//         }
-//       },
-//       {
-//         path: 'directive',
-//         component: () => import('@/views/permission/directive'),
-//         name: 'DirectivePermission',
-//         meta: {
-//           title: 'Directive Permission'
-//           // if do not set roles, means: this page does not require permission
-//         }
-//       },
-//       {
-//         path: 'role',
-//         component: () => import('@/views/permission/role'),
-//         name: 'RolePermission',
-//         meta: {
-//           title: 'Role Permission',
-//           roles: ['admin']
-//         }
-//       }
-//     ]
-//   },
+  {
+    path: '/accounts',
+    component: Layout,
+    children: [
+      {
+        path: 'index',
+        component: () => import('@/views/accounts/index'),
+        name: 'Accounts',
+        meta: { title: 'Quản lý tài khoản', icon: 'el-icon-user-solid', roles: ['admin'] }
+      }
+    ]
+  },
+  {
+    path: '/owners',
+    component: Layout,
+    children: [
+      {
+        path: 'index',
+        component: () => import('@/views/owners/index'),
+        name: 'Owners',
+        meta: { title: 'Quản lý chủ sở hữu', icon: 'el-icon-s-flag', roles: ['admin'] }
+      }
+    ]
+  },
+  {
+    path: '/vehicles',
+    component: Layout,
+    children: [
+      {
+        path: 'index',
+        component: () => import('@/views/vehicles/index'),
+        name: 'Vehicles',
+        meta: { title: 'Quản lý phương tiện', icon: 'el-icon-truck', roles: ['admin'] }
+  	  }
+    ]
+  },
+
+  //   {
+  //     path: '/permission',
+  //     component: Layout,
+  //     redirect: '/permission/page',
+  //     alwaysShow: true, // will always show the root menu
+  //     name: 'Permission',
+  //     meta: {
+  //       title: 'Permission',
+  //       icon: 'lock',
+  //       roles: ['admin', 'editor'] // you can set roles in root nav
+  //     },
+  //     children: [
+  //       {
+  //         path: 'page',
+  //         component: () => import('@/views/permission/page'),
+  //         name: 'PagePermission',
+  //         meta: {
+  //           title: 'Page Permission',
+  //           roles: ['admin'] // or you can only set roles in sub nav
+  //         }
+  //       },
+  //       {
+  //         path: 'directive',
+  //         component: () => import('@/views/permission/directive'),
+  //         name: 'DirectivePermission',
+  //         meta: {
+  //           title: 'Directive Permission'
+  //           // if do not set roles, means: this page does not require permission
+  //         }
+  //       },
+  //       {
+  //         path: 'role',
+  //         component: () => import('@/views/permission/role'),
+  //         name: 'RolePermission',
+  //         meta: {
+  //           title: 'Role Permission',
+  //           roles: ['admin']
+  //         }
+  //       }
+  //     ]
+  //   },
 
   //   {
   //     path: '/icon',

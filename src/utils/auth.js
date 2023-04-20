@@ -6,8 +6,8 @@ export function getToken() {
   return Cookies.get(TokenKey)
 }
 
-export function setToken() {
-  return Cookies.set(TokenKey, 'admin-token')
+export function setToken(value) {
+  return Cookies.set(TokenKey, value)
 }
 
 export function removeToken() {
