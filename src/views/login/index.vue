@@ -189,6 +189,10 @@ export default {
               Cookies.set('access-token', res.data.data.accessToken, {
                 expires: 7
               })
+              Cookies.set('userInfo', JSON.stringify(res.data.data), {
+                expires: 7
+              })
+              console.log(JSON.parse(Cookies.get('userInfo')))
               self.$router.push({
                 path: this.redirect || '/',
                 query: this.otherQuery

@@ -66,6 +66,16 @@ export default {
           email: '',
           avatar: '',
           role: ''
+
+          // username: '',
+          // address: '',
+          // email: '',
+          // avatar: '',
+          // role: '',
+          // birthday: '',
+          // fullName: '',
+          // gender: '',
+          // phoneNumber: ''
         }
       }
     }

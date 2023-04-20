@@ -86,6 +86,7 @@ export default {
       // eslint-disable-next-line no-mixed-spaces-and-tabs
       removeToken()
       Cookies.remove('access-token')
+      Cookies.remove('userInfo')
     }
   }
 }

@@ -61,6 +61,16 @@ export default {
         role: this.roles.join(' | '),
         email: 'admin@test.com',
         avatar: this.avatar
+
+        // username: this.username,
+        // address: this.address,
+        // email: this.email,
+        // avatar: this.avatar,
+        // role: this.role,
+        // birthday: this.birthday,
+        // fullName: this.fullName,
+        // gender: this.gender,
+        // phoneNumber: this.phoneNumber
       }
     }
   }

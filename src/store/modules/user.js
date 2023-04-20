@@ -8,6 +8,16 @@ const state = {
   avatar: '',
   introduction: '',
   roles: []
+
+  // username: '',
+  // address: '',
+  // email: '',
+  // avatar: '',
+  // role: '',
+  // birthday: '',
+  // fullName: '',
+  // gender: '',
+  // phoneNumber: ''
 }
 
 const mutations = {
@@ -26,6 +36,18 @@ const mutations = {
   SET_ROLES: (state, roles) => {
     state.roles = roles
   }
+
+  // SET_USERINFO: (state, userInfo) => {
+  //   state.avatar = userInfo.avatar
+  //   state.username = userInfo.username
+  //   state.address = userInfo.address
+  //   state.email = userInfo.email
+  //   state.role = userInfo.role
+  //   state.birthday = userInfo.birthday
+  //   state.fullName = userInfo.fullName
+  //   state.gender = userInfo.gender
+  //   state.phoneNumber = userInfo.phoneNumber
+  // }
 }
 
 const actions = {

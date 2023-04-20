@@ -21,6 +21,16 @@ export default {
         return {
           name: '',
           email: ''
+
+          // username: '',
+          // address: '',
+          // email: '',
+          // avatar: '',
+          // role: '',
+          // birthday: '',
+          // fullName: '',
+          // gender: '',
+          // phoneNumber: ''
         }
       }
     }
