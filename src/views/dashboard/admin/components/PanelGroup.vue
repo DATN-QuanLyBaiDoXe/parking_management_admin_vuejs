@@ -1,3 +1,4 @@
+<!-- eslint-disable vue/no-async-in-computed-properties -->
 <template>
   <el-row :gutter="40" class="panel-group">
     <el-col :xs="12" :sm="12" :lg="6" class="card-panel-col">
@@ -10,7 +11,7 @@
           <div class="card-panel-text">
             Lượt vào
           </div>
-          <count-to :start-val="0" :end-val="102400" :duration="2600" class="card-panel-num" />
+          <count-to :start-val="0" :end-val="inputVal" :duration="300" class="card-panel-num" />
         </div>
       </div>
     </el-col>
@@ -24,7 +25,7 @@
           <div class="card-panel-text">
             Lượt ra
           </div>
-          <count-to :start-val="0" :end-val="81212" :duration="3000" class="card-panel-num" />
+          <count-to :start-val="0" :end-val="outputVal" :duration="300" class="card-panel-num" />
         </div>
       </div>
     </el-col>
@@ -38,7 +39,7 @@
           <div class="card-panel-text">
             Còn trống
           </div>
-          <count-to :start-val="0" :end-val="13600" :duration="3600" class="card-panel-num" />
+          <count-to :start-val="0" :end-val="position" :duration="300" class="card-panel-num" />
         </div>
       </div>
     </el-col>
@@ -51,7 +52,7 @@
           <div class="card-panel-text">
             Doanh thu
           </div>
-          <count-to :start-val="0" :end-val="9280" :duration="3200" class="card-panel-num" />
+          <count-to :start-val="0" :end-val="money" :duration="300" class="card-panel-num" />
         </div>
       </div>
     </el-col>
@@ -60,14 +61,139 @@
 
 <script>
 import CountTo from 'vue-count-to'
+import axios from 'axios'
+import moment from 'moment'
+import Cookies from 'js-cookie'
 
 export default {
   components: {
     CountTo
   },
+  data() {
+    return {
+      startVal: 0,
+      inputVal: 0,
+	  outputVal: 0,
+	  position: 0,
+	  money: 0
+    }
+  },
+  created() {
+    this.getInputTraffic()
+    this.timer = setInterval(this.getInputTraffic, 30000)
+    this.getTotalMoney()
+    this.timer = setInterval(this.getTotalMoney, 30000)
+  },
   methods: {
     handleSetLineChartData(type) {
       this.$emit('handleSetLineChartData', type)
+    },
+
+    async getInputTraffic() {
+      const headers = {
+        'Content-Type': 'application/json',
+        Authorization: 'Bearer ' + Cookies.get('access-token')
+      }
+      const params = {
+        // page: this.queryPage.page > 0 ? this.queryPage.page - 1 : 0,
+        // size: this.queryPage.size,
+        // search: this.queryPage.search,
+        startDate: moment(new Date()).format('YYYY-MM-DDT00:00:00'),
+        endDate: moment(new Date()).format('YYYY-MM-DDT23:59:59'),
+        objectType: [],
+        eventType: ['IN'],
+        sourceType: [],
+        status: [
+          'NOT_SEEN',
+          'VERIFICATION',
+          'PROCESSING',
+          'PROCESSED'
+        ]
+      }
+      // eslint-disable-next-line vue/no-async-in-computed-properties
+      axios
+        .post(process.env.VUE_APP_API + 'management', params, { headers })
+        .then((res) => {
+          if (res.data) {
+            this.inputVal = res.data.total
+            this.loading = false
+            this.getOutputTraffic()
+          }
+        })
+        .catch((err) => {
+          console.log(moment(new Date()).format('YYYY-MM-DDT00:00:00'))
+          this.loading = false
+          this.$message({
+            message: err.response.data.message,
+            type: 'error'
+          })
+        })
+    },
+
+    async getOutputTraffic() {
+      const headers = {
+        'Content-Type': 'application/json',
+        Authorization: 'Bearer ' + Cookies.get('access-token')
+      }
+      const params = {
+        startDate: moment(new Date()).format('YYYY-MM-DDT00:00:00'),
+        endDate: moment(new Date()).format('YYYY-MM-DDT23:59:59'),
+        objectType: [],
+        eventType: ['OUT'],
+        sourceType: [],
+        status: [
+          'NOT_SEEN',
+          'VERIFICATION',
+          'PROCESSING',
+          'PROCESSED'
+        ]
+      }
+      // eslint-disable-next-line vue/no-async-in-computed-properties
+      axios
+        .post(process.env.VUE_APP_API + 'management', params, { headers })
+        .then((res) => {
+          if (res.data) {
+            this.outputVal = res.data.total
+            this.getPosition()
+            this.loading = false
+          }
+        })
+        .catch((err) => {
+          console.log(moment(new Date()).format('YYYY-MM-DDT00:00:00'))
+          this.loading = false
+          this.$message({
+            message: err.response.data.message,
+            type: 'error'
+          })
+        })
+    },
+
+    getPosition() {
+      // cái này này chú
+      this.position = 500 - this.inputVal + this.outputVal
+    },
+
+    getTotalMoney() {
+      const headers = {
+        'Content-Type': 'application/json',
+        Authorization: 'Bearer ' + Cookies.get('access-token')
+      }
+      // eslint-disable-next-line vue/no-async-in-computed-properties
+      axios
+        .get(process.env.VUE_APP_API + 'report/money', { headers })
+        .then((res) => {
+          if (res.data) {
+            this.money = res.data.data
+            this.loading = false
+          }
+        })
+        .catch((err) => {
+          this.loading = false
+          this.$message({
+            message: err.response.data.message,
+            type: 'error'
+          })
+        })
     }
   }
 }
@@ -158,6 +284,7 @@ export default {
 
       .card-panel-num {
         font-size: 20px;
+		float: right;
       }
     }
   }

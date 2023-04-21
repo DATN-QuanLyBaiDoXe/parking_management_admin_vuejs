@@ -33,9 +33,6 @@ import LineChart from './components/LineChart'
 import RaddarChart from './components/RaddarChart'
 import PieChart from './components/PieChart'
 import BarChart from './components/BarChart'
-import TransactionTable from './components/TransactionTable'
-import TodoList from './components/TodoList'
-import BoxCard from './components/BoxCard'
 
 const lineChartData = {
   newVisitis: {
@@ -81,7 +78,6 @@ export default {
 <style lang="scss" scoped>
 .dashboard-editor-container {
   padding: 32px;
-  padding-top: 15px;
   background-color: rgb(240, 242, 245);
   position: relative;
 
