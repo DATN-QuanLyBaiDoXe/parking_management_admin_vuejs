@@ -31,11 +31,10 @@
 <script>
 import { mapGetters } from 'vuex'
 import UserCard from './components/UserCard'
-import Account from './components/Account'
 
 export default {
   name: 'Profile',
-  components: { UserCard, Account },
+  components: { UserCard },
   data() {
     return {
       user: {},

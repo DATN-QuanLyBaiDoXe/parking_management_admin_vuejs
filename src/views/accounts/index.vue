@@ -1040,7 +1040,9 @@ export default {
             gender: this.userInfo.gender,
             birthday: this.userInfo.birthday,
             address: this.userInfo.address.trim(),
-            role: this.userInfo.role
+            role: this.userInfo.role,
+            password: this.userInfo.password,
+            matchingPassword: this.userInfo.matchingPassword
           }
           const headers = {
             'Content-Type': 'application/json',
