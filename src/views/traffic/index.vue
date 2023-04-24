@@ -106,7 +106,7 @@
                   <div
                     v-for="(val, ind) in trafficFlowMetricsByStatus"
                     :key="ind"
-                    class="text item"
+                    class="text item item-info-event"
                   >
                     <div class="title-label" style="margin-top: 28px ; font-size: 14px;">{{ val.name }}</div>
                     <p class="traffic-number">{{ val.total }}</p>
@@ -129,7 +129,7 @@
               class="btn"
               style="float: right; margin-left: 10px"
               type="info"
-              @click="handleObjectType('trafficByChartType', 'year')"
+              @click="handleObjectType('trafficByChartType', 'year', 'object')"
             >Năm
             </el-button>
             <el-button
@@ -137,7 +137,7 @@
               class="btn"
               style="float: right"
               type="info"
-              @click="handleObjectType('trafficByChartType', 'month')"
+              @click="handleObjectType('trafficByChartType', 'month', 'object')"
             >Tháng
             </el-button>
             <el-button
@@ -145,17 +145,17 @@
               class="btn"
               style="float: right"
               type="info"
-              @click="handleObjectType('trafficByChartType', 'day')"
+              @click="handleObjectType('trafficByChartType', 'day', 'object')"
             >Ngày
             </el-button>
           </div>
-          <div
+          <!-- <div
             v-if="trafficFlowByChartMetrics != null"
             class="infor-traffic-image padding-o"
             style="overflow: auto"
           >
             <BarChart :key="flagKeyChartTraffic" :traffic-for-chart="trafficFlowByChartMetrics" />
-          </div>
+          </div> -->
         </el-card>
       </div>
       <!-- <div class="right-box">
@@ -223,16 +223,18 @@ export default {
   },
   computed: {},
   created() {
-    this.getTrafficFlowReport('object', 'day')
-    this.getTrafficFlowReport('status', 'day')
+    // this.getTrafficFlowReport('object', 'day')
+    // this.getTrafficFlowReport('status', 'day')
+    this.init()
   },
   methods: {
-    async init() {
+    init() {
       this.getTrafficFlowReport('object', 'day')
       this.getTrafficFlowReport('status', 'day')
-	  this.getTrafficFlowReportByChart('day')
-
-	  const idIterval = setInterval(async function() {
+      //   this.getTrafficFlowReportByChart('day')
+      const self = this
+	  console.log(self.trafficFilterType)
+	  const idIterval = setInterval(function() {
         switch (self.trafficFilterType) {
           case 'hour':
             self.getTrafficFlowReport('object', 'hour')
@@ -247,20 +249,20 @@ export default {
             self.getTrafficFlowReport('object', 'day')
             break
         }
-        switch (self.trafficByChartFilterType) {
-          case 'hour':
-            self.getTrafficFlowReportByChart('hour')
-            break
-          case 'month':
-            self.getTrafficFlowReportByChart('month')
-            break
-          case 'year':
-            self.getTrafficFlowReportByChart('year')
-            break
-          default:
-            self.getTrafficFlowReportByChart('day')
-            break
-        }
+        // switch (self.trafficByChartFilterType) {
+        //   case 'hour':
+        //     self.getTrafficFlowReportByChart('hour')
+        //     break
+        //   case 'month':
+        //     self.getTrafficFlowReportByChart('month')
+        //     break
+        //   case 'year':
+        //     self.getTrafficFlowReportByChart('year')
+        //     break
+        //   default:
+        //     self.getTrafficFlowReportByChart('day')
+        //     break
+        // }
 	  }, 3000)
 	  this.intervalId = idIterval
       window.localStorage.setItem('intervalId', idIterval)
@@ -272,10 +274,10 @@ export default {
     //   }
       if (type === 'trafficByChartType') {
         this.trafficByChartFilterType = value
-        this.getTrafficFlowReportByChart(value)
+        // this.getTrafficFlowReportByChart(value)
       }
       if (type === 'trafficFlowType') {
-        if (this.trafficFilterType !== value) {
+        if (this.trafficFilterType !== value || this.trafficFilterTypeEvent !== value) {
 		  if (key == 'object') {
             this.trafficFilterType = value
             this.getTrafficFlowReport(key, value)
@@ -287,44 +289,30 @@ export default {
       }
     },
 
-    async reportTrafficFlowByChartResource(query) {
-      const headers = {
-        'Content-Type': 'multipart/form-data',
-        Authorization: 'Bearer ' + Cookies.get('access-token')
-      }
-      axios
-        .get(process.env.VUE_APP_API + 'report', {
-          headers: headers,
-          params: query
-        })
-        .then((res) => {
-          if (res.data) {
-            this.trafficFlowByObject = res.data.data
-          }
-        })
-        .catch((err) => {
-          console.log(err)
-          this.loading = false
-          this.$message({
-            message: err.response.data.message,
-            type: 'error'
-          })
-        })
-    },
-
-    async getTrafficFlowReportByChart(timeLevel) {
-      const query = {
-        filterObjectIds: '',
-        filterObjectType: 'cam',
-        filterTimeLevel: timeLevel
-      }
-      const result = await reportTrafficFlowByChartResource.list(query)
-      if (result && result.data) {
-        this.trafficFlowByChartMetrics = result.data
-        this.trafficByChartFilterType = timeLevel
-      }
-      this.flagKeyChartTraffic = Math.floor(Math.random() * 9999)
-    },
+    // async reportTrafficFlowByChartResource(query) {
+    //   const headers = {
+    //     'Content-Type': 'multipart/form-data',
+    //     Authorization: 'Bearer ' + Cookies.get('access-token')
+    //   }
+    //   axios
+    //     .get(process.env.VUE_APP_API + 'report', {
+    //       headers: headers,
+    //       params: query
+    //     })
+    //     .then((res) => {
+    //       if (res.data) {
+    //         this.trafficFlowByObject = res.data.data
+    //       }
+    //     })
+    //     .catch((err) => {
+    //       console.log(err)
+    //       this.loading = false
+    //       this.$message({
+    //         message: err.response.data.message,
+    //         type: 'error'
+    //       })
+    //     })
+    // },
 
     async getTrafficFlowReport(type, timeLevel) {
       const headers = {
@@ -486,6 +474,10 @@ export default {
 </style>
 
 <style lang="scss">
+.item-info-event:nth-child(3) {
+	min-width: 115px;
+}
+
 .infor-violations-table {
   tbody tr td:first-child .cell {
     /*padding-left: 0 !important;*/
