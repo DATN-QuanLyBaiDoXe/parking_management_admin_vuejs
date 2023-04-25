@@ -153,7 +153,7 @@
             class="infor-traffic-image padding-o"
             style="overflow: auto"
           >
-            <BarChart :key="flagKeyChartTraffic" :traffic-for-chart="trafficFlowByChartMetrics" />
+            <BarChart :key="flagKeyChartTraffic" :data-object="dataBarChartObject" />
           </div>
         </el-card>
       </div>
@@ -212,20 +212,20 @@ export default {
       trafficFilterType: 'day',
       trafficFilterTypeEvent: 'day',
       showTraffic: false,
-	    trafficFlowByObject: null,
-	    trafficFlowMetricsByObject: null,
-	    trafficFlowMetricsByStatus: null,
+	  trafficFlowByObject: null,
+	  trafficFlowMetricsByObject: null,
+	  trafficFlowMetricsByStatus: null,
       intervalId: null,
       totalTrafficByObject: 0,
       totalTrafficByStatus: 0,
-	    trafficByChartFilterType: 'day',
-	    trafficByChartFilterTypeEvent: 'day',
+	  trafficByChartFilterType: 'day',
+	  trafficByChartFilterTypeEvent: 'day',
       trafficFlowByChartMetrics: null,
       flagKeyChartTraffic: 1,
       trafficChartData: null,
       trafficFlowChart: null,
-	    trafficChartByObject: null,
-	    trafficChartByStatus: null,
+	  trafficChartByObject: null,
+	  trafficChartByStatus: null,
       labelBarChartObject: [],
       dataBarChartObject: []
     }
@@ -342,21 +342,17 @@ export default {
         })
       if (this.trafficChartData && type === 'object') {
         this.trafficChartByObject = this.trafficChartData
-        this.dataPieTraffic = this.handleGetValuePieChartInforTraffic()
+        // this.dataPieTraffic = this.handleGetValuePieChartInforTraffic()
         this.trafficByChartFilterType = timeLevel
-
+        this.dataBarChartObject = []
         for (const i in this.trafficChartByObject) {
-          if (this.trafficChartByObject[i].reportDTOList !== null) {
-            // this.trafficChartByObject.splice(i, 1)
-            this.labelBarChartObject = this.trafficChartByObject[i].time
-            this.dataBarChartObject = this.trafficChartByObject[i].reportDTOList
-            break
-          }
+          this.dataBarChartObject.push(this.trafficChartByObject[i])
         }
+        this.flagKeyChartTraffic = Math.floor(Math.random() * 1000000)
       }
 	  if (this.trafficChartData && type === 'status') {
         this.trafficChartByStatus = this.trafficChartData
-        this.dataPieTraffic = this.handleGetValuePieChartInforTrafficByStatus()
+        // this.dataPieTraffic = this.handleGetValuePieChartInforTrafficByStatus()
         this.trafficByChartFilterTypeEvent = timeLevel
 
         for (const i in this.trafficChartByStatus) {
