@@ -1,5 +1,5 @@
 <template>
-  <div :class="className" :style="{height:height,width:width}" />
+  <div :class="className" :style="{height:height,width:width}" style="padding-top: 10px;" />
 </template>
 
 <script>
@@ -22,7 +22,7 @@ export default {
     },
     height: {
       type: String,
-      default: '300px'
+      default: '450px'
     }
   },
   data() {
@@ -76,13 +76,13 @@ export default {
             type: 'shadow' // 默认为直线，可选为：'line' | 'shadow'
           }
         },
-        grid: {
-          top: 10,
-          left: '2%',
-          right: '2%',
-          bottom: '3%',
-          containLabel: true
-        },
+        // grid: {
+        //   top: 10,
+        //   left: '2%',
+        //   right: '2%',
+        //   bottom: '3%',
+        //   containLabel: true
+        // },
         xAxis: [{
           type: 'category',
           data: this.labelBarchart,
@@ -90,6 +90,14 @@ export default {
             alignWithLabel: true
           }
         }],
+        grid: {
+          top: 10 // Khoảng cách với trên cùng
+        },
+        legend: {
+          data: this.dataBarChart,
+          left: 'center',
+          bottom: 6
+        },
         yAxis: [{
           type: 'value',
           axisTick: {
