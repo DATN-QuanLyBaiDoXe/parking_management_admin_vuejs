@@ -150,6 +150,7 @@
             </el-button>
           </div>
           <div
+            v-if="dataBarChartObject != null"
             class="infor-traffic-image padding-o"
             style="overflow: auto"
           >
@@ -157,44 +158,44 @@
           </div>
         </el-card>
       </div>
-      <!-- <div class="right-box">
+      <div class="right-box">
         <el-card class="box-card">
           <div slot="header" class="clearfix">
             <span class="title-card">Biểu đồ sự kiện</span>
             <el-button
-              :class="{ 'btn-primary': eventByChartFilterType === 'year' }"
+              :class="{ 'btn-primary': trafficByChartFilterTypeEvent === 'year' }"
               class="btn"
               style="float: right; margin-left: 10px"
               type="info"
-              @click="handleObjectTypeInfo('eventByChartType', 'year')"
+              @click="handleObjectType('trafficByChartType', 'year', 'status')"
             >Năm
             </el-button>
             <el-button
-              :class="{ 'btn-primary': eventByChartFilterType === 'month' }"
+              :class="{ 'btn-primary': trafficByChartFilterTypeEvent === 'month' }"
               class="btn"
               style="float: right"
               type="info"
-              @click="handleObjectTypeInfo('eventByChartType', 'month')"
+              @click="handleObjectType('trafficByChartType', 'month', 'status')"
             >Tháng
             </el-button>
             <el-button
-              :class="{ 'btn-primary': eventByChartFilterType === 'day' }"
+              :class="{ 'btn-primary': trafficByChartFilterTypeEvent === 'day' }"
               class="btn"
               style="float: right"
               type="info"
-              @click="handleObjectTypeInfo('eventByChartType', 'day')"
+              @click="handleObjectType('trafficByChartType', 'day', 'status')"
             >Ngày
             </el-button>
           </div>
           <div
-            v-if="eventByChartMetrics != null"
+            v-if="dataBarChartStatus != null"
             class="infor-violations padding-o"
             style="overflow: auto"
           >
-            <GroupBarChart :key="flagKeyChartTrafficEvent" :event-by-chart-metrics="eventByChartMetrics" />
+            <bar-chart-status :key="flagKeyChartTrafficStatus" :data-object="dataBarChartStatus" />
           </div>
         </el-card>
-      </div> -->
+      </div>
     </div>
   </div>
 </template>
@@ -203,10 +204,11 @@
 import axios from 'axios'
 import Cookies from 'js-cookie'
 import BarChart from './components/BarChart'
+import BarChartStatus from './components/BarChartStatus'
 
 export default {
   name: 'Traffic',
-  components: { BarChart },
+  components: { BarChart, BarChartStatus },
   data() {
     return {
       trafficFilterType: 'day',
@@ -222,12 +224,13 @@ export default {
 	  trafficByChartFilterTypeEvent: 'day',
       trafficFlowByChartMetrics: null,
       flagKeyChartTraffic: 1,
+      flagKeyChartTrafficStatus: 1,
       trafficChartData: null,
       trafficFlowChart: null,
 	  trafficChartByObject: null,
 	  trafficChartByStatus: null,
-      labelBarChartObject: [],
-      dataBarChartObject: []
+      dataBarChartObject: [],
+      dataBarChartStatus: []
     }
   },
   computed: {},
@@ -290,7 +293,7 @@ export default {
     },
     handleObjectType(type, value, key) {
       if (type === 'trafficByChartType') {
-        if (this.trafficByChartFilterType !== value) {
+        if (this.trafficByChartFilterType !== value || this.trafficByChartFilterTypeEvent !== value) {
           if (key == 'object') {
             this.trafficByChartFilterType = value
             this.getTrafficFlowReportByChart(key, value)
@@ -314,6 +317,7 @@ export default {
     },
 
     async getTrafficFlowReportByChart(type, timeLevel) {
+      console.log('aaaaaaaaaaaaa', type)
       const headers = {
         'Content-Type': 'multipart/form-data',
         Authorization: 'Bearer ' + Cookies.get('access-token')
@@ -342,7 +346,6 @@ export default {
         })
       if (this.trafficChartData && type === 'object') {
         this.trafficChartByObject = this.trafficChartData
-        // this.dataPieTraffic = this.handleGetValuePieChartInforTraffic()
         this.trafficByChartFilterType = timeLevel
         this.dataBarChartObject = []
         for (const i in this.trafficChartByObject) {
@@ -352,16 +355,12 @@ export default {
       }
 	  if (this.trafficChartData && type === 'status') {
         this.trafficChartByStatus = this.trafficChartData
-        // this.dataPieTraffic = this.handleGetValuePieChartInforTrafficByStatus()
         this.trafficByChartFilterTypeEvent = timeLevel
-
+        this.dataBarChartStatus = []
         for (const i in this.trafficChartByStatus) {
-          if (this.trafficChartByStatus[i].reportDTOList !== null) {
-            // this.trafficChartByStatus.splice(i, 1)
-            this.labelBarChartObject = this.trafficChartByObject[i].time
-            break
-          }
+          this.dataBarChartStatus.push(this.trafficChartByStatus[i])
         }
+        this.flagKeyChartTrafficStatus = Math.floor(Math.random() * 1000000)
       }
     },
 
