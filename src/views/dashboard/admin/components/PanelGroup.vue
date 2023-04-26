@@ -73,9 +73,9 @@ export default {
     return {
       startVal: 0,
       inputVal: 0,
-	  outputVal: 0,
-	  position: 0,
-	  money: 0
+	    outputVal: 0,
+	    position: 0,
+	    money: 0
     }
   },
   created() {
@@ -215,8 +215,10 @@ export default {
     overflow: hidden;
     color: #666;
     background: #fff;
-    box-shadow: 4px 4px 40px rgba(0, 0, 0, .05);
+    // box-shadow: 4px 4px 40px rgba(0, 0, 0, .05);
     border-color: rgba(0, 0, 0, .05);
+    border: 1px solid #e6ebf5;
+    box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
 
     &:hover {
       .card-panel-icon-wrapper {
