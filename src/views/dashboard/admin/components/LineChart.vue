@@ -82,7 +82,11 @@ export default {
           axisPointer: {
             type: 'cross'
           },
-          padding: [5, 10]
+          padding: [5, 10],
+          textStyle: {
+            fontFamily: 'Arial',
+            fontSize: 14
+          }
         },
         yAxis: {
           axisTick: {
@@ -90,10 +94,15 @@ export default {
           }
         },
         legend: {
-          data: ['expected', 'actual']
+          data: ['Lượt vào', 'Lượt ra'],
+          textStyle: {
+            fontFamily: 'Arial',
+            fontSize: 14
+          }
         },
         series: [{
-          name: 'expected', itemStyle: {
+          name: 'Lượt vào',
+          itemStyle: {
             normal: {
               color: '#FF005A',
               lineStyle: {
@@ -109,7 +118,7 @@ export default {
           animationEasing: 'cubicInOut'
         },
         {
-          name: 'actual',
+          name: 'Lượt ra',
           smooth: true,
           type: 'line',
           itemStyle: {
