@@ -11,7 +11,7 @@ import echarts from 'echarts'
 require('echarts/theme/macarons') // echarts theme
 import resize from '@/mixins/resize'
 
-const animationDuration = 3000
+const animationDuration = 500
 
 export default {
   mixins: [resize],
@@ -62,6 +62,26 @@ export default {
           trigger: 'axis',
           axisPointer: { // 坐标轴指示器，坐标轴触发有效
             type: 'shadow' // 默认为直线，可选为：'line' | 'shadow'
+          },
+          textStyle: {
+            fontFamily: 'Arial',
+            fontSize: 14
+          },
+          formatter: function(params, ticket, callback) {
+            const label = params[0].axisValue
+            const total = params.reduce((res, item) => {
+              res += item.value
+              return res
+            }, 0)
+
+            const lastText = params.reduce((res, item) => {
+              res += '<div style="display:flex; justify-content: flex-start; align-item: center; margin-top: 10px">'
+              res += '<div style="width:10px; height:10px; margin-right:5px; border-radius: 50%; background-color:' + item.color + '"></div>'
+              res += '<span style="line-height:14px">' + item.seriesName + ': ' + item.value + '</span>'
+              res += '</div>'
+              return res
+            }, '')
+            return label + '<br/> Tổng: ' + total + '<br/>' + lastText
           }
         },
         xAxis: [{
@@ -78,7 +98,7 @@ export default {
           data: ['Ô tô', 'Xe máy', 'Xe đạp điện', 'Xe đạp'],
           left: 'center',
           bottom: 6,
-		  textStyle: {
+          textStyle: {
             fontFamily: 'Arial',
             fontSize: 14
           }
@@ -116,13 +136,6 @@ export default {
           stack: 'vistors',
           barWidth: '60%',
           data: this.handleGetValueWithKey(4),
-          animationDuration
-        }, {
-          name: 'Tổng cộng',
-          type: 'bar',
-          stack: 'vistors',
-          barWidth: '60%',
-          data: this.handleGetLine(),
           animationDuration
         }]
       })

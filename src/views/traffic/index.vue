@@ -214,34 +214,35 @@ export default {
       trafficFilterType: 'day',
       trafficFilterTypeEvent: 'day',
       showTraffic: false,
-	  trafficFlowByObject: null,
-	  trafficFlowMetricsByObject: null,
-	  trafficFlowMetricsByStatus: null,
+	    trafficFlowByObject: null,
+	    trafficFlowMetricsByObject: null,
+	    trafficFlowMetricsByStatus: null,
       intervalId: null,
       totalTrafficByObject: 0,
       totalTrafficByStatus: 0,
-	  trafficByChartFilterType: 'day',
-	  trafficByChartFilterTypeEvent: 'day',
+	    trafficByChartFilterType: 'day',
+	    trafficByChartFilterTypeEvent: 'day',
       trafficFlowByChartMetrics: null,
       flagKeyChartTraffic: 1,
       flagKeyChartTrafficStatus: 1,
       trafficChartData: null,
       trafficFlowChart: null,
-	  trafficChartByObject: null,
-	  trafficChartByStatus: null,
+	    trafficChartByObject: null,
+	    trafficChartByStatus: null,
       dataBarChartObject: [],
       dataBarChartStatus: []
     }
   },
   computed: {},
   created() {
-    // this.init()
+    this.init()
   },
   methods: {
     init() {
       this.getTrafficFlowReport('object', 'day')
       this.getTrafficFlowReport('status', 'day')
       this.getTrafficFlowReportByChart('object', 'day')
+      this.getTrafficFlowReportByChart('status', 'day')
       const self = this
 	    console.log(self.trafficFilterType)
 	    const idIterval = setInterval(function() {
@@ -287,7 +288,21 @@ export default {
             self.getTrafficFlowReportByChart('object', 'day')
             break
         }
-	  }, 3000)
+        switch (self.trafficByChartFilterTypeEvent) {
+          case 'hour':
+            self.getTrafficFlowReportByChart('status', 'hour')
+            break
+          case 'month':
+            self.getTrafficFlowReportByChart('status', 'month')
+            break
+          case 'year':
+            self.getTrafficFlowReportByChart('status', 'year')
+            break
+          default:
+            self.getTrafficFlowReportByChart('status', 'day')
+            break
+        }
+	  }, 30000)
 	  this.intervalId = idIterval
       window.localStorage.setItem('intervalId', idIterval)
     },
@@ -317,7 +332,6 @@ export default {
     },
 
     async getTrafficFlowReportByChart(type, timeLevel) {
-      console.log('aaaaaaaaaaaaa', type)
       const headers = {
         'Content-Type': 'multipart/form-data',
         Authorization: 'Bearer ' + Cookies.get('access-token')
@@ -353,7 +367,7 @@ export default {
         }
         this.flagKeyChartTraffic = Math.floor(Math.random() * 1000000)
       }
-	  if (this.trafficChartData && type === 'status') {
+	    if (this.trafficChartData && type === 'status') {
         this.trafficChartByStatus = this.trafficChartData
         this.trafficByChartFilterTypeEvent = timeLevel
         this.dataBarChartStatus = []

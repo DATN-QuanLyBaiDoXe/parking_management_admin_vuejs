@@ -1000,7 +1000,6 @@ export default {
             })
             .catch((err) => {
               this.loading_add = false
-			  console.log('account ', err.response.data.message)
               this.$message({
                 message: err.response.data.message,
                 type: 'error'
