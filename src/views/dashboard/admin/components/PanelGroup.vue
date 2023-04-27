@@ -71,8 +71,8 @@ export default {
   },
   data() {
     return {
-      startVal: 0,
-      inputVal: 0,
+      	startVal: 0,
+      	inputVal: 0,
 	    outputVal: 0,
 	    position: 0,
 	    money: 0
@@ -95,9 +95,6 @@ export default {
         Authorization: 'Bearer ' + Cookies.get('access-token')
       }
       const params = {
-        // page: this.queryPage.page > 0 ? this.queryPage.page - 1 : 0,
-        // size: this.queryPage.size,
-        // search: this.queryPage.search,
         startDate: moment(new Date()).format('YYYY-MM-DDT00:00:00'),
         endDate: moment(new Date()).format('YYYY-MM-DDT23:59:59'),
         objectType: [],

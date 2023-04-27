@@ -244,7 +244,6 @@ export default {
       this.getTrafficFlowReportByChart('object', 'day')
       this.getTrafficFlowReportByChart('status', 'day')
       const self = this
-	    console.log(self.trafficFilterType)
 	    const idIterval = setInterval(function() {
         switch (self.trafficFilterType) {
           case 'hour':

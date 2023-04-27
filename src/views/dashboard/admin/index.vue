@@ -11,70 +11,91 @@
     >
       <line-chart :chart-data="lineChartData" />
     </el-row>
-
-    <!-- <el-row :gutter="32">
-      <el-col :xs="24" :sm="24" :lg="8">
-        <div class="chart-wrapper">
-          <raddar-chart />
-        </div>
-      </el-col>
-      <el-col :xs="24" :sm="24" :lg="8">
-        <div class="chart-wrapper">
-          <pie-chart />
-        </div>
-      </el-col>
-      <el-col :xs="24" :sm="24" :lg="8">
-        <div class="chart-wrapper">
-          <bar-chart />
-        </div>
-      </el-col>
-    </el-row> -->
   </div>
 </template>
 
 <script>
+import axios from 'axios'
+import Cookies from 'js-cookie'
 import PanelGroup from './components/PanelGroup'
 import LineChart from './components/LineChart'
-import RaddarChart from './components/RaddarChart'
-import PieChart from './components/PieChart'
-import BarChart from './components/BarChart'
 
 const lineChartData = {
-  newVisitis: {
-    expectedData: [100, 120, 161, 134, 105, 160, 165],
-    actualData: [120, 82, 91, 154, 162, 140, 145]
-  },
-  messages: {
-    expectedData: [200, 192, 120, 144, 160, 130, 140],
-    actualData: [180, 160, 151, 106, 145, 150, 130]
-  },
-  purchases: {
-    expectedData: [80, 100, 121, 104, 105, 90, 100],
-    actualData: [120, 90, 100, 138, 142, 130, 130]
-  },
-  shoppings: {
-    expectedData: [130, 140, 141, 142, 145, 150, 160],
-    actualData: [120, 82, 91, 154, 162, 140, 130]
-  }
+  expectedData: [100, 120, 161, 134, 105, 160, 165],
+  actualData: [120, 82, 91, 154, 162, 140, 145]
 }
 
 export default {
   name: 'DashboardAdmin',
   components: {
     PanelGroup,
-    LineChart,
-    RaddarChart,
-    PieChart,
-    BarChart
+    LineChart
   },
   data() {
     return {
-      lineChartData: lineChartData.newVisitis
+      lineChartData: lineChartData,
+	  lineData: null
     }
   },
+  created() {
+    this.init()
+    // setInterval(this.getTrafficFlowReport(), 3000)
+  },
   methods: {
+    init() {
+      this.getTrafficFlowReport()
+	  const self = this
+	  setInterval(function() {
+        self.getTrafficFlowReport()
+	  }, 3000)
+    },
     handleSetLineChartData(type) {
       this.lineChartData = lineChartData[type]
+    },
+    async getTrafficFlowReport() {
+      const headers = {
+        'Content-Type': 'multipart/form-data',
+        Authorization: 'Bearer ' + Cookies.get('access-token')
+      }
+      await axios
+        .get(process.env.VUE_APP_API + 'report/line', {
+          headers: headers
+        })
+        .then((res) => {
+          if (res.data) {
+            this.lineData = res.data.data
+          }
+        })
+        .catch((err) => {
+          console.log(err)
+          this.loading = false
+          this.$message({
+            message: err.response.data.message,
+            type: 'error'
+          })
+        })
+      if (this.lineData) {
+        this.lineChartData.actualData = []
+        this.lineChartData.expectedData = []
+        const day = ['Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7', 'Chủ nhật']
+        day.forEach((d) => {
+          let flag = false
+          this.lineData.forEach((element) => {
+            if (d == element.time) {
+              flag = true
+              if (element.code == 'Vào') {
+                this.lineChartData.actualData.push(element.total)
+              } else {
+                this.lineChartData.expectedData.push(element.total)
+			  }
+            }
+          })
+		  if (flag == false) {
+            this.lineChartData.actualData.push(0)
+            this.lineChartData.expectedData.push(0)
+          }
+        })
+      }
     }
   }
 }

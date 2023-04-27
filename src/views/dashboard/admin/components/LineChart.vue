@@ -101,7 +101,7 @@ export default {
           }
         },
         series: [{
-          name: 'Lượt vào',
+          name: 'Lượt ra',
           itemStyle: {
             normal: {
               color: '#FF005A',
@@ -118,7 +118,7 @@ export default {
           animationEasing: 'cubicInOut'
         },
         {
-          name: 'Lượt ra',
+          name: 'Lượt vào',
           smooth: true,
           type: 'line',
           itemStyle: {
@@ -138,6 +138,9 @@ export default {
           animationEasing: 'quadraticOut'
         }]
       })
+    },
+    inputTraffic() {
+
     }
   }
 }
