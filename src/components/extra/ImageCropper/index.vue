@@ -768,7 +768,7 @@ export default {
       axios.post(process.env.VUE_APP_UPLOAD_URL + url, fmData, {
         headers: {
           'Content-Type': 'multipart/form-data',
-          'Authorization': 'Bearer ' + isLogged(),
+          'Authorization': 'Bearer ',
         },
       })
       .then(resData => {

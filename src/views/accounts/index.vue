@@ -73,7 +73,16 @@
       <div id="detail-vehicle" class="violation-ruleForm" style="width: 0">
         <i class="el-icon-close" @click="closeDetail()" />
         <template v-if="userDetail">
-          <div class="avatar" />
+
+          <div class="avatar">
+            <img
+              v-if="userDetail.avatar"
+              height="125px"
+              width="125px"
+              :src="userDetail.avatar"
+            >
+            <img v-else height="125px" width="125px" :src="user_default">
+          </div>
 
           <template v-if="userDetail.username">
             <div class="item-label">Tên đăng nhập</div>
@@ -636,7 +645,6 @@ export default {
         gender: 0,
         birthday: '',
         address: '',
-        avatar: '',
         role: ''
       },
       userUpdate: {
@@ -1022,6 +1030,7 @@ export default {
 
     handleEdit(data) {
       this.userInfo = _.cloneDeep(data)
+      this.url = data.avatar
       this.dialogEdit = true
       this.$nextTick(() => {
         this.$refs['editForm'].clearValidate()
@@ -1049,7 +1058,8 @@ export default {
             Authorization: 'Bearer ' + Cookies.get('access-token')
           }
           this.loadingVehicle = true
-		  params.birthday = moment(params.birthday).format('DD/MM/YYYY')
+          params.avatar = this.url
+		      params.birthday = moment(params.birthday).format('DD/MM/YYYY')
           axios
             .put(process.env.VUE_APP_API + 'user/' + this.userInfo.uuid, params, { headers })
             .then((response) => {
