@@ -99,7 +99,15 @@
       <div id="detail-vehicle" class="violation-ruleForm" style="width: 0">
         <i class="el-icon-close" @click="closeDetail()" />
         <template v-if="eventDetail">
-          <div class="avatar" />
+          <div class="event-image">
+            <img
+              v-if="eventDetail.image"
+              height="200px"
+              width="100%"
+              :src="eventDetail.image"
+            >
+            <img v-else height="200px" width="100%" :src="user_default">
+          </div>
 
           <template v-if="eventDetail.eventType">
             <div class="item-label">Loại sự kiện</div>
@@ -798,7 +806,7 @@ export default {
               this.onChangeInputSearch()
               this.closeDetail()
               this.loadingVehicle = false
-			  this.$message({
+			        this.$message({
                 type: 'success',
                 message: res.data.message
               })
@@ -840,13 +848,14 @@ export default {
             eventType: this.eventInfo.eventType,
             objectType: this.eventInfo.objectType,
             place: this.eventInfo.place,
-            image: this.eventInfo.image,
+            // image: this.eventInfo.image,
             description: this.eventInfo.description
           }
           const headers = {
             'Content-Type': 'application/json',
             Authorization: 'Bearer ' + Cookies.get('access-token')
           }
+          params.image = this.url
           this.loadingVehicleEdit = true
           axios
             .put(process.env.VUE_APP_API + 'management/event/' + this.eventInfo.uuid, params, { headers })
@@ -969,10 +978,9 @@ export default {
             eventType: data.eventType,
             objectType: data.objectType,
             place: data.place,
-            image: data.image,
             description: data.description
           }
-          //   paramRegister.image = this.url
+          paramRegister.image = this.url
           this.loading_add = true
           axios
             .post(process.env.VUE_APP_API + 'management/event', paramRegister, { headers })
