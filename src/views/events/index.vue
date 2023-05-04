@@ -46,7 +46,7 @@
         <el-table
           ref="multipleTable"
           v-loading="loading"
-          :data="userList"
+          :data="eventList"
           style="width: 100%"
           @selection-change="handleSelectionChange"
           @row-click="rowClicked"
@@ -205,7 +205,10 @@
                 />
               </el-select>
             </el-form-item>
-            <el-form-item style="margin-bottom: 21px" label="Biển số" prop="place">
+            <el-form-item v-if="[1,2,3].includes(eventInfo.objectType)" style="margin-bottom: 21px" label="Biển số" prop="place">
+              <el-input v-model="eventInfo.place" maxlength="9" />
+            </el-form-item>
+            <el-form-item v-else style="margin-bottom: 21px" label="Biển số">
               <el-input v-model="eventInfo.place" maxlength="9" />
             </el-form-item>
             <!-- <el-form-item style="margin-bottom: 21px" label="Ảnh" prop="image">
@@ -215,7 +218,7 @@
             </el-form-item> -->
             <el-form-item label="Hình ảnh">
               <UploadImage
-                :key="flagUpload"
+                :key="keyResetUpload"
                 :list-image="listFile"
                 @removeUploadImage="removeUploadImageHandle"
                 @getListFile="getListFile"
@@ -232,7 +235,7 @@
         <el-button
           type="primary"
           :loading="loading_add"
-          @click="addEvent()"
+          @click="addEventHandle()"
         >Lưu
         </el-button>
       </div>
@@ -282,7 +285,10 @@
                 />
               </el-select>
             </el-form-item>
-            <el-form-item style="margin-bottom: 21px" label="Biển số" prop="place">
+            <el-form-item v-if="[1,2,3].includes(eventInfo.objectType)" style="margin-bottom: 21px" label="Biển số" prop="place">
+              <el-input v-model="eventInfo.place" maxlength="9" />
+            </el-form-item>
+            <el-form-item v-else style="margin-bottom: 21px" label="Biển số">
               <el-input v-model="eventInfo.place" maxlength="9" />
             </el-form-item>
             <!-- <el-form-item style="margin-bottom: 21px" label="Ảnh" prop="image">
@@ -292,7 +298,7 @@
             </el-form-item> -->
             <el-form-item label="Hình ảnh">
               <UploadImage
-                :key="flagUpload"
+                :key="keyResetUpload"
                 :list-image="listFile"
                 @removeUploadImage="removeUploadImageHandle"
                 @getListFile="getListFile"
@@ -314,7 +320,7 @@
         <el-button
           type="primary"
           :loading="loadingVehicleEdit"
-          @click="editEvent()"
+          @click="editEventHandle()"
         >Lưu
         </el-button>
       </div>
@@ -386,7 +392,7 @@ export default {
       loading: true,
       loadingVehicle: false,
       loadingVehicleEdit: false,
-      userList: [],
+      eventList: [],
       multiSelected: [],
       allSelected: false,
       loading_delete_all: false,
@@ -414,20 +420,6 @@ export default {
         sourceType: [],
         status: []
       },
-      user: {
-        uuid: '',
-        username: '',
-        password: '',
-        matchingPassword: '',
-        fullName: '',
-        phoneNumber: '',
-        email: '',
-        gender: '',
-        birthday: '',
-        address: '',
-        avatar: '',
-        role: ''
-      },
       eventInfo: {
         uuid: '',
         eventType: '',
@@ -438,22 +430,9 @@ export default {
         status: '',
         description: ''
       },
-      userUpdate: {
-        uuid: '',
-        username: '',
-        password: '',
-        matchingPassword: '',
-        fullName: '',
-        phoneNumber: '',
-        email: '',
-        gender: '',
-        birthday: '',
-        address: '',
-        avatar: '',
-        role: ''
-      },
       eventDetail: {},
       imagecropperKey: 0,
+	  keyResetUpload: 999,
       imagecropperShow: false,
       url: null,
       user_default: user_default,
@@ -563,7 +542,7 @@ export default {
       if (newValue.length === 0) {
         this.indeterminate = false
         this.allSelected = false
-      } else if (newValue.length === this.userList.length) {
+      } else if (newValue.length === this.eventList.length) {
         this.indeterminate = false
         this.allSelected = true
       } else {
@@ -585,22 +564,19 @@ export default {
       this.url = null
       this.eventInfo = {
         uuid: '',
-        email: '',
-        phoneNumber: '',
-        username: '',
-        fullName: '',
-        matchingPassword: '',
-        password: '',
-        gender: '',
-        birthday: '',
-        address: '',
-        avatar: '',
-        role: ''
+        eventType: '',
+        place: '',
+        objectType: '',
+        sourceType: '',
+        image: '',
+        video: '',
+        status: '',
+        description: ''
       }
     },
 
     toggleAll(checked) {
-      this.multiSelected = checked ? this.userList.slice() : []
+      this.multiSelected = checked ? this.eventList.slice() : []
     },
     handleSizeChange(size) {
       this.queryPage.size = size
@@ -682,7 +658,7 @@ export default {
         .post(process.env.VUE_APP_API + 'management', params, { headers })
         .then((res) => {
           if (res.data) {
-            this.userList = res.data.data
+            this.eventList = res.data.data
             this.queryPage.total = res.data.total
             this.loading = false
           }
@@ -828,12 +804,17 @@ export default {
 
     handleCreate() {
       this.resetDialog()
+
+	  this.listFile = []
+	  this.keyResetUpload = Math.random()
       this.dialogAdd = true
-	    this.eventInfo.gender = 0
     },
 
     handleEdit(data) {
       this.eventInfo = _.cloneDeep(data)
+	  console.log(this.eventInfo)
+	  this.listFile = this.eventInfo.image ? this.eventInfo.image.split(',') : []
+	  this.keyResetUpload = Math.random()
       this.dialogEdit = true
       this.$nextTick(() => {
         this.$refs['editForm'].clearValidate()
@@ -848,14 +829,13 @@ export default {
             eventType: this.eventInfo.eventType,
             objectType: this.eventInfo.objectType,
             place: this.eventInfo.place,
-            // image: this.eventInfo.image,
+            image: this.eventInfo.image,
             description: this.eventInfo.description
           }
           const headers = {
             'Content-Type': 'application/json',
             Authorization: 'Bearer ' + Cookies.get('access-token')
           }
-          params.image = this.url
           this.loadingVehicleEdit = true
           axios
             .put(process.env.VUE_APP_API + 'management/event/' + this.eventInfo.uuid, params, { headers })
@@ -902,64 +882,183 @@ export default {
       })
     },
 
-    cropSuccess(data) {
-      if (data.data[0].fileDownloadUri) this.url = data.data[0].fileDownloadUri
-    },
-    fileSelected(e) {
-      const file = e.target.files[0]
-      if (file) {
-        this.checkFile(file)
-          .then(() => {
-            this.file.data = file
-            this.imagecropperShow = true
-            this.resetUploadFile()
-          })
-          .catch((err) => {
-            this.$message({
-              message: err,
-              type: 'error',
-              duration: 5 * 1000,
-              showClose: true
-            })
-          })
-      }
-    },
-    checkFile(file) {
-      return new Promise((resolve, reject) => {
-        const self = this
-        if (file.type.indexOf('image') === -1) {
-          return reject('Định dạng không cho phép')
-        }
-        if (file.size > 5242880) {
-          return reject('Vượt quá dung lượng cho phép tối đa 5Mb')
-        }
-        const reader = new FileReader()
-        reader.readAsDataURL(file)
-        reader.onload = function(e) {
-          const image = new Image()
-          image.src = e.target.result
-          image.onload = function() {
-            const height = this.height
-            const width = this.width
-            if (height < self.avatarHeight || width < self.avatarWith) {
-              return reject(
-                'Kích thước hình ảnh quá nhỏ. Tối thiểu là: ' +
-                  self.avatarWith +
-                  '*' +
-                  self.avatarHeight
-              )
-            }
-            return resolve()
-          }
-        }
-      })
-    },
-    closeChangeAvatar() {},
     handleClick(e) {
       if (e.target !== this.$refs.file) {
         e.preventDefault()
         if (document.activeElement !== this.$refs) {
           this.$refs.file.click()
+        }
+      }
+    },
+    async editEventHandle() {
+      if (this.listFile && this.listFile.length > 0) this.uploadImgEdit()
+      if (
+        this.listFile &&
+          this.listFile.length == 0 &&
+          this.listFileVideo &&
+          this.listFileVideo.length > 0
+      ) {
+        this.uploadVideo()
+      }
+      if (
+        this.listFile &&
+          this.listFile.length == 0 &&
+          this.listFileVideo &&
+          this.listFileVideo.length == 0
+      ) {
+        this.editEvent()
+      }
+    },
+    async addEventHandle() {
+      if (this.listFile && this.listFile.length > 0) this.uploadImg()
+      if (
+        this.listFile &&
+          this.listFile.length == 0 &&
+          this.listFileVideo &&
+          this.listFileVideo.length > 0
+      ) {
+        this.uploadVideo()
+      }
+      if (
+        this.listFile &&
+          this.listFile.length == 0 &&
+          this.listFileVideo &&
+          this.listFileVideo.length == 0
+      ) {
+        this.addEvent()
+      }
+    },
+    async uploadVideo() {
+      this.loadingImg = true
+      const params = new FormData()
+      this.listFileVideo.forEach((everyFile) => {
+        params.append('file', everyFile.raw)
+      })
+      const headers = {
+        'Content-Type': 'multipart/form-data',
+        Authorization: 'Bearer '
+      }
+      axios
+        .post(process.env.VUE_APP_UPLOAD_URL + 'file', params, {
+          headers: headers
+        })
+        .then((res) => {
+          if (res.data.data) {
+            const data = []
+            res.data.data.forEach((val) => {
+              data.push(val.fileDownloadUri)
+            })
+            if (data.length > 0) this.eventInfo.videoUrl = data.toString()
+            this.addEvent()
+          }
+        })
+        .catch()
+    },
+    async uploadImgEdit() {
+      this.loadingImg = true
+      const params = new FormData()
+      let flag = false
+      this.listFile.forEach((everyFile) => {
+        if (everyFile.raw) {
+          flag = true
+          params.append('file', everyFile.raw)
+        }
+      })
+      let oldFile = this.listFile.filter(function(val) {
+        return !val.raw
+      })
+      if (oldFile.length > 0) {
+        oldFile = oldFile.map(function(val) {
+          return val.url ? val.url : val
+        })
+      }
+      console.log(oldFile)
+      const headers = {
+        'Content-Type': 'multipart/form-data',
+        Authorization: 'Bearer '
+      }
+      if (flag) {
+        axios
+          .post(process.env.VUE_APP_UPLOAD_URL + 'file', params, {
+            headers: headers
+          })
+          .then((res) => {
+            if (res.data.data) {
+              const data = oldFile
+              res.data.data.forEach((val) => {
+                data.push(val.fileDownloadUri)
+              })
+              if (data.length > 0) this.eventInfo.image = data.toString()
+              if (this.listFileVideo && this.listFileVideo.length > 0) {
+                this.uploadVideo()
+              }
+              if (this.listFileVideo && this.listFileVideo.length == 0) {
+                this.editEvent()
+              }
+            }
+          })
+          .catch()
+      } else {
+        if (oldFile.length > 0) this.eventInfo.imageUrl = oldFile.toString()
+        if (this.listFileVideo && this.listFileVideo.length > 0) {
+          this.uploadVideo()
+        }
+        if (this.listFileVideo && this.listFileVideo.length == 0) {
+          this.editEvent(this.eventInfo)
+        }
+      }
+    },
+    async uploadImg() {
+      this.loadingImg = true
+      const params = new FormData()
+      let flag = false
+      this.listFile.forEach((everyFile) => {
+        if (everyFile.raw) {
+          flag = true
+          params.append('file', everyFile.raw)
+        }
+      })
+      let oldFile = this.listFile.filter(function(val) {
+        return !val.raw
+      })
+      if (oldFile.length > 0) {
+        oldFile = oldFile.map(function(val) {
+          return val.url ? val.url : val
+        })
+      }
+      console.log(oldFile)
+      const headers = {
+        'Content-Type': 'multipart/form-data',
+        Authorization: 'Bearer '
+      }
+      if (flag) {
+        axios
+          .post(process.env.VUE_APP_UPLOAD_URL + 'file', params, {
+            headers: headers
+          })
+          .then((res) => {
+            if (res.data.data) {
+              const data = oldFile
+              res.data.data.forEach((val) => {
+                data.push(val.fileDownloadUri)
+              })
+              if (data.length > 0) this.eventInfo.image = data.toString()
+              if (this.listFileVideo && this.listFileVideo.length > 0) {
+                this.uploadVideo()
+              }
+              if (this.listFileVideo && this.listFileVideo.length == 0) {
+                this.addEvent()
+              }
+            }
+          })
+          .catch()
+      } else {
+        if (oldFile.length > 0) this.eventInfo.imageUrl = oldFile.toString()
+        if (this.listFileVideo && this.listFileVideo.length > 0) {
+          this.uploadVideo()
+        }
+        if (this.listFileVideo && this.listFileVideo.length == 0) {
+          this.addEvent(this.eventInfo)
         }
       }
     },
@@ -978,9 +1077,9 @@ export default {
             eventType: data.eventType,
             objectType: data.objectType,
             place: data.place,
-            description: data.description
+            description: data.description,
+            image: this.eventInfo.image
           }
-          paramRegister.image = this.url
           this.loading_add = true
           axios
             .post(process.env.VUE_APP_API + 'management/event', paramRegister, { headers })
