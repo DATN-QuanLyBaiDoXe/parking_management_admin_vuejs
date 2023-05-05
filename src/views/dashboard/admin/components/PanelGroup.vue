@@ -75,16 +75,32 @@ export default {
       	inputVal: 0,
 	    outputVal: 0,
 	    position: 0,
-	    money: 0
+	    money: 0,
+      intervalId: null,
+      intervalId1: null
     }
   },
   created() {
-    this.getInputTraffic()
-    this.timer = setInterval(this.getInputTraffic, 30000)
-    this.getTotalMoney()
-    this.timer = setInterval(this.getTotalMoney, 30000)
+    this.init()
+  },
+  beforeDestroy() {
+    if (this.intervalId) {
+      clearInterval(this.intervalId)
+    }
   },
   methods: {
+    init() {
+      this.getInputTraffic()
+      this.getTotalMoney()
+      const self = this
+	  const idIterval = setInterval(function() {
+        self.getInputTraffic()
+        self.getTotalMoney()
+	  }, 30000)
+      this.intervalId = idIterval
+      window.localStorage.setItem('intervalId', idIterval)
+    },
+
     handleSetLineChartData(type) {
       this.$emit('handleSetLineChartData', type)
     },

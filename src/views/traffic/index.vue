@@ -234,6 +234,11 @@ export default {
     }
   },
   computed: {},
+  beforeDestroy() {
+    if (this.intervalId) {
+      clearInterval(this.intervalId)
+    }
+  },
   created() {
     this.init()
   },
