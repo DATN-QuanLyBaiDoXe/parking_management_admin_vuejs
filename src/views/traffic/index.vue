@@ -487,6 +487,18 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.app-container {
+    /* display: -webkit-box; */
+    display: -ms-flexbox;
+    /* display: flex; */
+    -webkit-box-pack: center;
+    -ms-flex-pack: center;
+    justify-content: center;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+}
+
 .el-button + .el-button {
   margin-left: 10px;
 }
