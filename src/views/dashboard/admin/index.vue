@@ -40,7 +40,6 @@ export default {
   },
   created() {
     this.init()
-    // setInterval(this.getTrafficFlowReport(), 3000)
   },
   beforeDestroy() {
     if (this.intervalId) {
@@ -53,7 +52,7 @@ export default {
 	  const self = this
 	  const idIterval = setInterval(function() {
         self.getTrafficFlowReport()
-	  }, 3000)
+	  }, 30000)
 	  this.intervalId = idIterval
       window.localStorage.setItem('intervalId', idIterval)
     },

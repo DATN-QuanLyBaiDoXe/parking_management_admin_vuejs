@@ -76,8 +76,7 @@ export default {
 	    outputVal: 0,
 	    position: 0,
 	    money: 0,
-      intervalId: null,
-      intervalId1: null
+      intervalId: null
     }
   },
   created() {
