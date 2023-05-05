@@ -334,7 +334,7 @@ import axios from 'axios'
 import UploadImage from '@/components/uploadImage'
 import moment from 'moment'
 import Cookies from 'js-cookie'
-import user_default from '@/assets/images/user_default.png'
+import user_default from '@/assets/images/no_preview.jpg'
 import { inject } from 'vue'
 import Search from '@/components/search-event'
 

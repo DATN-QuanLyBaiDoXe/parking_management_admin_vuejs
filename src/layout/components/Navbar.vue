@@ -28,7 +28,8 @@
         trigger="click"
       >
         <div class="avatar-wrapper">
-          <img :src="avatar + '?imageView2/1/w/80/h/80'" class="user-avatar">
+          <img v-if="userInfo.avatar" :src="userInfo.avatar" class="user-avatar">
+          <img v-else :src="avatar + '?imageView2/1/w/80/h/80'" class="user-avatar">
           <!-- <i class="el-icon-caret-bottom" /> -->
         </div>
         <el-dropdown-menu slot="dropdown">
@@ -57,10 +58,7 @@
 import { mapGetters } from 'vuex'
 import Breadcrumb from '@/components/Breadcrumb'
 import Hamburger from '@/components/Hamburger'
-import ErrorLog from '@/components/ErrorLog'
 import Screenfull from '@/components/Screenfull'
-import SizeSelect from '@/components/SizeSelect'
-import Search from '@/components/HeaderSearch'
 import { removeToken } from '@/utils/auth'
 import Cookies from 'js-cookie'
 
@@ -68,13 +66,18 @@ export default {
   components: {
     Breadcrumb,
     Hamburger,
-    ErrorLog,
-    Screenfull,
-    SizeSelect,
-    Search
+    Screenfull
   },
   computed: {
     ...mapGetters(['sidebar', 'avatar', 'device'])
+  },
+  data() {
+    return {
+      userInfo: null
+    }
+  },
+  created() {
+    this.userInfo = Cookies.getJSON('userInfo')
   },
   methods: {
     toggleSideBar() {

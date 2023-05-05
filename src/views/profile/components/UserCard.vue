@@ -455,6 +455,7 @@ export default {
 
     handleEdit(data) {
       this.userInfo = _.cloneDeep(data)
+	  this.url = this.userInfo.avatar
       this.dialogEdit = true
       this.$nextTick(() => {
         this.$refs['editForm'].clearValidate()
@@ -479,6 +480,7 @@ export default {
             'Content-Type': 'application/json',
             Authorization: 'Bearer ' + Cookies.get('access-token')
           }
+		  params.avatar = this.url
 		  params.birthday = moment(params.birthday).format('DD/MM/YYYY')
           axios
             .put(process.env.VUE_APP_API + 'user/' + this.userInfo.uuid, params, { headers })
