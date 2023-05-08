@@ -145,7 +145,10 @@
                 v-model="vehicleInfo.color"
               />
             </el-form-item>
-            <el-form-item style="margin-bottom: 21px" label="Biển số" prop="place">
+            <el-form-item v-if="[1,2,3].includes(vehicleInfo.vehicleType)" style="margin-bottom: 21px" label="Biển số" prop="place">
+              <el-input v-model="vehicleInfo.place" maxlength="9" />
+            </el-form-item>
+            <el-form-item v-else style="margin-bottom: 21px" label="Biển số">
               <el-input v-model="vehicleInfo.place" maxlength="9" />
             </el-form-item>
           </div>

@@ -34,20 +34,27 @@ export default {
   data() {
     return {
       lineChartData: lineChartData,
-	  lineData: null
+	  lineData: null,
+	  intervalId: null
     }
   },
   created() {
     this.init()
-    // setInterval(this.getTrafficFlowReport(), 3000)
+  },
+  beforeDestroy() {
+    if (this.intervalId) {
+      clearInterval(this.intervalId)
+    }
   },
   methods: {
     init() {
       this.getTrafficFlowReport()
 	  const self = this
-	  setInterval(function() {
+	  const idIterval = setInterval(function() {
         self.getTrafficFlowReport()
-	  }, 3000)
+	  }, 30000)
+	  this.intervalId = idIterval
+      window.localStorage.setItem('intervalId', idIterval)
     },
     handleSetLineChartData(type) {
       this.lineChartData = lineChartData[type]
