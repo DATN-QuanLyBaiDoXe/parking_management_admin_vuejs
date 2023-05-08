@@ -1,200 +1,210 @@
 <template>
   <div class="app-container claim">
-    <div class="violations-process-box st-box">
-      <div class="left-box" :class="{ nopadding: showTraffic }">
-        <el-card class="box-card">
-          <div slot="header" class="clearfix">
-            <span class="title-card">Thông tin lưu lượng</span>
-            <el-button
-              class="btn"
-              :class="{ 'btn-primary': trafficFilterType == 'year' }"
-              style="float: right; margin-left: 10px"
-              type="info"
-              @click="handleObjectType('trafficFlowType', 'year', 'object')"
-            >Năm
-            </el-button>
-            <el-button
-              class="btn"
-              :class="{ 'btn-primary': trafficFilterType == 'month' }"
-              style="float: right"
-              type="info"
-              @click="handleObjectType('trafficFlowType', 'month', 'object')"
-            >Tháng
-            </el-button>
-            <el-button
-              class="btn"
-              :class="{ 'btn-primary': trafficFilterType == 'day' }"
-              style="float: right"
-              type="info"
-              @click="handleObjectType('trafficFlowType', 'day', 'object')"
-            >Ngày
-            </el-button>
-            <el-button
-              class="btn"
-              :class="{ 'btn-primary': trafficFilterType == 'hour' }"
-              style="float: right"
-              type="info"
-              @click="handleObjectType('trafficFlowType', 'hour', 'object')"
-            >Giờ
-            </el-button>
-          </div>
-          <div class="body-box-content">
-            <div v-if="!showTraffic" class="content-left">
-              <div v-if="trafficFlowMetricsByObject" class="infor-traffic-image">
-                <div class="text item">
-                  <div class="title-label" style="margin-top: 28px ; font-size: 14px;">Tổng số</div>
-                  <p class="traffic-number">{{ totalTrafficByObject }}</p>
-                </div>
-                <div
-                  v-for="(val, ind) in trafficFlowMetricsByObject"
-                  :key="ind"
-                  class="text item"
-                >
-                  <div class="title-label" style="margin-top: 28px ; font-size: 14px;">{{ val.name }}</div>
-                  <p class="traffic-number">{{ val.total }}</p>
-                </div>
-              </div>
+    <!-- <button @click="exportFile">export</button> -->
+    <el-button
+      class="btn-add"
+      type="primary"
+      icon="el-icon-download"
+      style="margin-bottom: 10px;"
+      @click="exportFile"
+    >Xuất báo cáo</el-button>
+    <div id="traffic-export" ref="trafficExport">
+      <div class="violations-process-box st-box">
+        <div class="left-box">
+          <el-card class="box-card">
+            <div slot="header" class="clearfix">
+              <span class="title-card">Thông tin lưu lượng</span>
+              <el-button
+                class="btn"
+                :class="{ 'btn-primary': trafficFilterType == 'year' }"
+                style="float: right; margin-left: 10px"
+                type="info"
+                @click="handleObjectType('trafficFlowType', 'year', 'object')"
+              >Năm
+              </el-button>
+              <el-button
+                class="btn"
+                :class="{ 'btn-primary': trafficFilterType == 'month' }"
+                style="float: right"
+                type="info"
+                @click="handleObjectType('trafficFlowType', 'month', 'object')"
+              >Tháng
+              </el-button>
+              <el-button
+                class="btn"
+                :class="{ 'btn-primary': trafficFilterType == 'day' }"
+                style="float: right"
+                type="info"
+                @click="handleObjectType('trafficFlowType', 'day', 'object')"
+              >Ngày
+              </el-button>
+              <el-button
+                class="btn"
+                :class="{ 'btn-primary': trafficFilterType == 'hour' }"
+                style="float: right"
+                type="info"
+                @click="handleObjectType('trafficFlowType', 'hour', 'object')"
+              >Giờ
+              </el-button>
             </div>
-          </div>
-        </el-card>
-      </div>
-      <div class="right-box">
-        <el-card class="box-card">
-          <div slot="header" class="clearfix">
-            <span class="title-card">Thông tin sự kiện</span>
-            <el-button
-              class="btn"
-              :class="{ 'btn-primary': trafficFilterTypeEvent == 'year' }"
-              style="float: right; margin-left: 10px"
-              type="info"
-              @click="handleObjectType('trafficFlowType', 'year', 'status')"
-            >Năm
-            </el-button>
-            <el-button
-              class="btn"
-              :class="{ 'btn-primary': trafficFilterTypeEvent == 'month' }"
-              style="float: right"
-              type="info"
-              @click="handleObjectType('trafficFlowType', 'month', 'status')"
-            >Tháng
-            </el-button>
-            <el-button
-              class="btn"
-              :class="{ 'btn-primary': trafficFilterTypeEvent == 'day' }"
-              style="float: right"
-              type="info"
-              @click="handleObjectType('trafficFlowType', 'day', 'status')"
-            >Ngày
-            </el-button>
-            <el-button
-              class="btn"
-              :class="{ 'btn-primary': trafficFilterTypeEvent == 'hour' }"
-              style="float: right"
-              type="info"
-              @click="handleObjectType('trafficFlowType', 'hour', 'status')"
-            >Giờ
-            </el-button>
-          </div>
-          <div class="body-box-content">
-            <template>
+            <div class="body-box-content">
               <div v-if="!showTraffic" class="content-left">
-                <div v-if="trafficFlowMetricsByStatus" class="infor-traffic-image">
+                <div v-if="trafficFlowMetricsByObject" class="infor-traffic-image">
                   <div class="text item">
                     <div class="title-label" style="margin-top: 28px ; font-size: 14px;">Tổng số</div>
-                    <p class="traffic-number">{{ totalTrafficByStatus }}</p>
+                    <p class="traffic-number">{{ totalTrafficByObject }}</p>
                   </div>
                   <div
-                    v-for="(val, ind) in trafficFlowMetricsByStatus"
+                    v-for="(val, ind) in trafficFlowMetricsByObject"
                     :key="ind"
-                    class="text item item-info-event"
+                    class="text item"
                   >
                     <div class="title-label" style="margin-top: 28px ; font-size: 14px;">{{ val.name }}</div>
                     <p class="traffic-number">{{ val.total }}</p>
                   </div>
                 </div>
               </div>
-            </template>
-          </div>
-        </el-card>
+            </div>
+          </el-card>
+        </div>
+        <div class="right-box">
+          <el-card class="box-card">
+            <div slot="header" class="clearfix">
+              <span class="title-card">Thông tin sự kiện</span>
+              <el-button
+                class="btn"
+                :class="{ 'btn-primary': trafficFilterTypeEvent == 'year' }"
+                style="float: right; margin-left: 10px"
+                type="info"
+                @click="handleObjectType('trafficFlowType', 'year', 'status')"
+              >Năm
+              </el-button>
+              <el-button
+                class="btn"
+                :class="{ 'btn-primary': trafficFilterTypeEvent == 'month' }"
+                style="float: right"
+                type="info"
+                @click="handleObjectType('trafficFlowType', 'month', 'status')"
+              >Tháng
+              </el-button>
+              <el-button
+                class="btn"
+                :class="{ 'btn-primary': trafficFilterTypeEvent == 'day' }"
+                style="float: right"
+                type="info"
+                @click="handleObjectType('trafficFlowType', 'day', 'status')"
+              >Ngày
+              </el-button>
+              <el-button
+                class="btn"
+                :class="{ 'btn-primary': trafficFilterTypeEvent == 'hour' }"
+                style="float: right"
+                type="info"
+                @click="handleObjectType('trafficFlowType', 'hour', 'status')"
+              >Giờ
+              </el-button>
+            </div>
+            <div class="body-box-content">
+              <template>
+                <div v-if="!showTraffic" class="content-left">
+                  <div v-if="trafficFlowMetricsByStatus" class="infor-traffic-image">
+                    <div class="text item">
+                      <div class="title-label" style="margin-top: 28px ; font-size: 14px;">Tổng số</div>
+                      <p class="traffic-number">{{ totalTrafficByStatus }}</p>
+                    </div>
+                    <div
+                      v-for="(val, ind) in trafficFlowMetricsByStatus"
+                      :key="ind"
+                      class="text item item-info-event"
+                    >
+                      <div class="title-label" style="margin-top: 28px ; font-size: 14px;">{{ val.name }}</div>
+                      <p class="traffic-number">{{ val.total }}</p>
+                    </div>
+                  </div>
+                </div>
+              </template>
+            </div>
+          </el-card>
+        </div>
       </div>
-    </div>
 
-    <div class="violations-process-box nopadding">
-      <div class="left-box">
-        <el-card class="box-card">
-          <div slot="header" class="clearfix">
-            <span class="title-card">Biểu đồ lưu lượng</span>
-            <el-button
-              :class="{ 'btn-primary': trafficByChartFilterType === 'year' }"
-              class="btn"
-              style="float: right; margin-left: 10px"
-              type="info"
-              @click="handleObjectType('trafficByChartType', 'year', 'object')"
-            >Năm
-            </el-button>
-            <el-button
-              :class="{ 'btn-primary': trafficByChartFilterType === 'month' }"
-              class="btn"
-              style="float: right"
-              type="info"
-              @click="handleObjectType('trafficByChartType', 'month', 'object')"
-            >Tháng
-            </el-button>
-            <el-button
-              :class="{ 'btn-primary': trafficByChartFilterType === 'day' }"
-              class="btn"
-              style="float: right"
-              type="info"
-              @click="handleObjectType('trafficByChartType', 'day', 'object')"
-            >Ngày
-            </el-button>
-          </div>
-          <div
-            v-if="dataBarChartObject != null"
-            class="infor-traffic-image padding-o"
-            style="overflow: auto"
-          >
-            <BarChart :key="flagKeyChartTraffic" :data-object="dataBarChartObject" />
-          </div>
-        </el-card>
-      </div>
-      <div class="right-box">
-        <el-card class="box-card">
-          <div slot="header" class="clearfix">
-            <span class="title-card">Biểu đồ sự kiện</span>
-            <el-button
-              :class="{ 'btn-primary': trafficByChartFilterTypeEvent === 'year' }"
-              class="btn"
-              style="float: right; margin-left: 10px"
-              type="info"
-              @click="handleObjectType('trafficByChartType', 'year', 'status')"
-            >Năm
-            </el-button>
-            <el-button
-              :class="{ 'btn-primary': trafficByChartFilterTypeEvent === 'month' }"
-              class="btn"
-              style="float: right"
-              type="info"
-              @click="handleObjectType('trafficByChartType', 'month', 'status')"
-            >Tháng
-            </el-button>
-            <el-button
-              :class="{ 'btn-primary': trafficByChartFilterTypeEvent === 'day' }"
-              class="btn"
-              style="float: right"
-              type="info"
-              @click="handleObjectType('trafficByChartType', 'day', 'status')"
-            >Ngày
-            </el-button>
-          </div>
-          <div
-            v-if="dataBarChartStatus != null"
-            class="infor-violations padding-o"
-            style="overflow: auto"
-          >
-            <bar-chart-status :key="flagKeyChartTrafficStatus" :data-object="dataBarChartStatus" />
-          </div>
-        </el-card>
+      <div class="violations-process-box">
+        <div class="left-box">
+          <el-card class="box-card">
+            <div slot="header" class="clearfix">
+              <span class="title-card">Biểu đồ lưu lượng</span>
+              <el-button
+                :class="{ 'btn-primary': trafficByChartFilterType === 'year' }"
+                class="btn"
+                style="float: right; margin-left: 10px"
+                type="info"
+                @click="handleObjectType('trafficByChartType', 'year', 'object')"
+              >Năm
+              </el-button>
+              <el-button
+                :class="{ 'btn-primary': trafficByChartFilterType === 'month' }"
+                class="btn"
+                style="float: right"
+                type="info"
+                @click="handleObjectType('trafficByChartType', 'month', 'object')"
+              >Tháng
+              </el-button>
+              <el-button
+                :class="{ 'btn-primary': trafficByChartFilterType === 'day' }"
+                class="btn"
+                style="float: right"
+                type="info"
+                @click="handleObjectType('trafficByChartType', 'day', 'object')"
+              >Ngày
+              </el-button>
+            </div>
+            <div
+              v-if="dataBarChartObject != null"
+              class="infor-traffic-image padding-o"
+              style="overflow: auto"
+            >
+              <BarChart :key="flagKeyChartTraffic" :data-object="dataBarChartObject" />
+            </div>
+          </el-card>
+        </div>
+        <div class="right-box">
+          <el-card class="box-card">
+            <div slot="header" class="clearfix">
+              <span class="title-card">Biểu đồ sự kiện</span>
+              <el-button
+                :class="{ 'btn-primary': trafficByChartFilterTypeEvent === 'year' }"
+                class="btn"
+                style="float: right; margin-left: 10px"
+                type="info"
+                @click="handleObjectType('trafficByChartType', 'year', 'status')"
+              >Năm
+              </el-button>
+              <el-button
+                :class="{ 'btn-primary': trafficByChartFilterTypeEvent === 'month' }"
+                class="btn"
+                style="float: right"
+                type="info"
+                @click="handleObjectType('trafficByChartType', 'month', 'status')"
+              >Tháng
+              </el-button>
+              <el-button
+                :class="{ 'btn-primary': trafficByChartFilterTypeEvent === 'day' }"
+                class="btn"
+                style="float: right"
+                type="info"
+                @click="handleObjectType('trafficByChartType', 'day', 'status')"
+              >Ngày
+              </el-button>
+            </div>
+            <div
+              v-if="dataBarChartStatus != null"
+              class="infor-violations padding-o"
+              style="overflow: auto"
+            >
+              <bar-chart-status :key="flagKeyChartTrafficStatus" :data-object="dataBarChartStatus" />
+            </div>
+          </el-card>
+        </div>
       </div>
     </div>
   </div>
@@ -205,6 +215,8 @@ import axios from 'axios'
 import Cookies from 'js-cookie'
 import BarChart from './components/BarChart'
 import BarChartStatus from './components/BarChartStatus'
+import domtoimage from 'dom-to-image'
+import moment from 'moment'
 
 export default {
   name: 'Traffic',
@@ -214,21 +226,21 @@ export default {
       trafficFilterType: 'day',
       trafficFilterTypeEvent: 'day',
       showTraffic: false,
-	    trafficFlowByObject: null,
-	    trafficFlowMetricsByObject: null,
-	    trafficFlowMetricsByStatus: null,
+      trafficFlowByObject: null,
+      trafficFlowMetricsByObject: null,
+      trafficFlowMetricsByStatus: null,
       intervalId: null,
       totalTrafficByObject: 0,
       totalTrafficByStatus: 0,
-	    trafficByChartFilterType: 'day',
-	    trafficByChartFilterTypeEvent: 'day',
+      trafficByChartFilterType: 'day',
+      trafficByChartFilterTypeEvent: 'day',
       trafficFlowByChartMetrics: null,
       flagKeyChartTraffic: 1,
       flagKeyChartTrafficStatus: 1,
       trafficChartData: null,
       trafficFlowChart: null,
-	    trafficChartByObject: null,
-	    trafficChartByStatus: null,
+      trafficChartByObject: null,
+      trafficChartByStatus: null,
       dataBarChartObject: [],
       dataBarChartStatus: []
     }
@@ -244,7 +256,7 @@ export default {
       this.getTrafficFlowReportByChart('object', 'day')
       this.getTrafficFlowReportByChart('status', 'day')
       const self = this
-	    const idIterval = setInterval(function() {
+      const idIterval = setInterval(function() {
         switch (self.trafficFilterType) {
           case 'hour':
             self.getTrafficFlowReport('object', 'hour')
@@ -301,9 +313,20 @@ export default {
             self.getTrafficFlowReportByChart('status', 'day')
             break
         }
-	  }, 30000)
-	  this.intervalId = idIterval
+      }, 30000)
+      this.intervalId = idIterval
       window.localStorage.setItem('intervalId', idIterval)
+    },
+    exportFile() {
+      const element = this.$refs.trafficExport // document.getElementById('traffic-export')
+
+      domtoimage.toJpeg(element, { quality: 0.95 })
+        .then((dataUrl) => {
+          const link = document.createElement('a')
+          link.download = 'Bao_cao_luu_luong_' + moment(new Date()).format('YYYY_MM_DD') + '.jpeg'
+          link.href = dataUrl
+          link.click()
+        })
     },
     handleObjectType(type, value, key) {
       if (type === 'trafficByChartType') {
@@ -366,7 +389,7 @@ export default {
         }
         this.flagKeyChartTraffic = Math.floor(Math.random() * 1000000)
       }
-	    if (this.trafficChartData && type === 'status') {
+      if (this.trafficChartData && type === 'status') {
         this.trafficChartByStatus = this.trafficChartData
         this.trafficByChartFilterTypeEvent = timeLevel
         this.dataBarChartStatus = []
@@ -416,7 +439,7 @@ export default {
           }
         }
       }
-	  if (this.trafficFlowByObject && type === 'status') {
+      if (this.trafficFlowByObject && type === 'status') {
         this.trafficFlowMetricsByStatus = this.trafficFlowByObject
         this.dataPieTraffic = this.handleGetValuePieChartInforTrafficByStatus()
         this.trafficFilterTypeEvent = timeLevel

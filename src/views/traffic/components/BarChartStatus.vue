@@ -93,6 +93,8 @@ export default {
           }
         }],
         grid: {
+          width: '92%',
+          left: '6%',
           top: 10 // Khoảng cách với trên cùng
         },
         legend: {

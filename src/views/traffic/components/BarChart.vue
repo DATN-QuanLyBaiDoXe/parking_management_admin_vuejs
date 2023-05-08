@@ -1,7 +1,7 @@
 <template>
   <div
     :class="className"
-    :style="{height:height,width:width}"
+    :style="{height:height, width:width}"
     style="padding-top: 10px;"
   />
 </template>
@@ -37,7 +37,7 @@ export default {
     return {
       chart: null,
       dataBarChart: [],
-	  label: []
+      label: []
     }
   },
   mounted() {
@@ -92,6 +92,8 @@ export default {
           }
         }],
         grid: {
+          width: '92%',
+          left: '6%',
           top: 10 // Khoảng cách với trên cùng
         },
         legend: {
