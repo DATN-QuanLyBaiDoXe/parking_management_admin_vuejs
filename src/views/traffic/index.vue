@@ -7,7 +7,7 @@
       icon="el-icon-download"
       style="margin-bottom: 10px;"
       @click="exportFile"
-    >Xuất báo cáo</el-button>
+    >Xuất file</el-button>
     <div id="traffic-export" ref="trafficExport">
       <div class="violations-process-box st-box">
         <div class="left-box">
