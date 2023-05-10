@@ -143,7 +143,10 @@
             <div class="item-text">{{ eventDetail.description }}</div>
           </template>
 
-          <div class="action">
+          <div
+            class="action"
+            style="display: flex; justify-content: space-between;"
+          >
             <el-button
               type="info"
               @click="handleEdit(eventDetail)"
@@ -151,10 +154,15 @@
             </el-button>
             <el-button
               type="danger"
-              style="float: right"
               :loading="loadingVehicle"
               @click="destroy(eventDetail)"
             ><i class="el-icon-delete" /> Xóa
+            </el-button>
+            <el-button
+              type="warning"
+              :loading="loadingVehicle"
+              @click="updateEventStatus(eventDetail.uuid, 5)"
+            ><i class="el-icon-warning-outline" /> Báo sai
             </el-button>
           </div>
         </template>
@@ -725,17 +733,70 @@ export default {
         .catch(() => {})
     },
 
+    updateEventStatus(uuid, status) {
+      const params = {
+        uuid: uuid,
+        status: status
+      }
+      const headers = {
+        'Content-Type': 'application/json',
+        Authorization: 'Bearer ' + Cookies.get('access-token')
+      }
+      this.loadingVehicleEdit = true
+      axios
+        .put(process.env.VUE_APP_API + 'management/update-status', params, { headers })
+        .then((response) => {
+          if (
+            response.data.status === 200 ||
+                response.data.status === 201
+          ) {
+            this.getUser()
+            this.$message({
+              message: response.data.message,
+              type: 'success'
+            })
+            this.eventDetail = response.data.data
+            if (this.eventDetail) {
+              document.getElementById('vehicle-table').style.width =
+            'calc(100% - 406px)'
+              setTimeout(function() {
+                document.getElementById('detail-vehicle').style.display = 'block'
+                document.getElementById('detail-vehicle').style.width = '380px'
+              }, 500)
+            }
+          } else {
+            this.getUser()
+            this.$message({
+              message: response.data.message,
+              type: 'error'
+            })
+          }
+          this.loadingVehicleEdit = false
+        })
+        .catch((err) => {
+          this.loadingVehicleEdit = false
+          this.$message({
+            message: err.response.data.message,
+            type: 'error'
+          })
+        })
+    },
+
     async rowClicked(row) {
       this.flag_active = row.uuid
       if (row) {
         this.eventDetail = row
-        if (this.eventDetail) {
-          document.getElementById('vehicle-table').style.width =
+        if (this.eventDetail.status == 1) {
+          this.updateEventStatus(this.eventDetail.uuid, 2)
+        } else {
+          if (this.eventDetail) {
+            document.getElementById('vehicle-table').style.width =
             'calc(100% - 406px)'
-          setTimeout(function() {
-            document.getElementById('detail-vehicle').style.display = 'block'
-            document.getElementById('detail-vehicle').style.width = '380px'
-          }, 500)
+            setTimeout(function() {
+              document.getElementById('detail-vehicle').style.display = 'block'
+              document.getElementById('detail-vehicle').style.width = '380px'
+            }, 500)
+          }
         }
       } else {
         this.$message({
