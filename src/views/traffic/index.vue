@@ -1,5 +1,5 @@
 <template>
-  <div class="app-container claim">
+  <div class="app-container1 claim">
     <!-- <button @click="exportFile">export</button> -->
     <el-button
       class="btn-add"
@@ -515,7 +515,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.app-container {
+.app-container1 {
     /* display: -webkit-box; */
     display: -ms-flexbox;
     /* display: flex; */
@@ -525,6 +525,7 @@ export default {
     -webkit-box-align: center;
     -ms-flex-align: center;
     align-items: center;
+    padding: 20px;
 }
 
 .el-button + .el-button {
