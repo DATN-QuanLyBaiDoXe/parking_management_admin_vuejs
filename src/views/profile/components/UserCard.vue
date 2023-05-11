@@ -51,23 +51,23 @@
       >
         <el-form
           ref="updateForm"
-          :model="userInfo"
+          :model="userPass"
           :rules="rulesUpdatePass"
           label-position="top"
           label-width="100%"
         >
           <div class="block-item">
             <el-form-item label="Mật khẩu hiện tại" prop="currentPassword">
-              <el-input v-model="userInfo.currentPassword" maxlength="32" type="password" />
+              <el-input v-model="userPass.currentPassword" maxlength="32" type="password" />
             </el-form-item>
 
             <el-form-item label="Mật khẩu mới" prop="newPassword">
-              <el-input v-model="userInfo.newPassword" maxlength="32" type="password" />
+              <el-input v-model="userPass.newPassword" maxlength="32" type="password" />
             </el-form-item>
 
             <el-form-item label="Xác nhận mật khẩu" prop="matchingPassword">
               <el-input
-                v-model="userInfo.matchingPassword"
+                v-model="userPass.matchingPassword"
                 type="password"
                 maxlength="32"
               />
@@ -256,16 +256,6 @@ export default {
           email: '',
           avatar: '',
           role: ''
-
-          // username: '',
-          // address: '',
-          // email: '',
-          // avatar: '',
-          // role: '',
-          // birthday: '',
-          // fullName: '',
-          // gender: '',
-          // phoneNumber: ''
         }
       }
     }
@@ -306,11 +296,16 @@ export default {
     }
 
     return {
+      userPass: {
+        currentPassword: null,
+        newPassword: null,
+        matchingPassword: null
+      },
       userInfo: null,
-	  uuid: '',
-	  dialogEdit: false,
-	  dialogUpdate: false,
-	  loading_add: false,
+	    uuid: '',
+	    dialogEdit: false,
+	    dialogUpdate: false,
+	    loading_add: false,
       imagecropperKey: 0,
       imagecropperShow: false,
       url: null,
@@ -326,7 +321,7 @@ export default {
       },
       avatarHeight: 200,
       avatarWith: 200,
-	  rolesLst: [
+	    rolesLst: [
         {
           value: 1,
           label: 'Quản trị viên'
@@ -587,7 +582,7 @@ export default {
       }
     },
     handleUpdatePassword() {
-      this.resetDialog()
+      // this.resetDialog()
       this.dialogUpdate = true
     },
 
@@ -608,9 +603,9 @@ export default {
             Authorization: 'Bearer ' + Cookies.get('access-token')
           }
           const params = {
-            currentPassword: this.userInfo.currentPassword,
-            newPassword: this.userInfo.newPassword,
-            matchingPassword: this.userInfo.matchingPassword
+            currentPassword: this.userPass.currentPassword,
+            newPassword: this.userPass.newPassword,
+            matchingPassword: this.userPass.matchingPassword
           }
 		  this.loading_add = true
           axios
